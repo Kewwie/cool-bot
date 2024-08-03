@@ -6,36 +6,30 @@ import {
     ColorResolvable,
     ClientPresenceStatus
 } from "discord.js";
-
-import { PluginManager } from "./managers/plugin";
-import { Plugins } from "./plugins/plugins";
+import { readdirSync } from "fs";
+import { resolve } from "path";
 
 import { CommandManager } from "./managers/command";
-import { ComponentManager } from "./managers/component";
 import { EventManager } from "./managers/event";
-import { LoopManager } from "./managers/loop";
 
-import { Button } from "./types/component";
-import { SlashCommand } from "./types/command";
+import { SlashCommand, PrefixCommand } from "./types/command";
 import { Event, Events } from "./types/event";
-import { Loop } from "./types/loop";
 
 export class KiwiClient extends Client {
     public embed: { 
-        color: ColorResolvable | null;
+        color: {
+            fail: ColorResolvable | null;
+            success: ColorResolvable | null;
+            normal: ColorResolvable | null;
+        };
     };
 
-    public buttons: Collection<string, Button>;
     public SlashCommands: Collection<string, SlashCommand>;
-    public PrefixCommands: Collection<string, SlashCommand>;
-    public events: Collection<string, Event>;
-    public loops: Collection<string, Loop>;
+    public PrefixCommands: Collection<string, PrefixCommand>;
+    public Events: Collection<string, Event>;
 
-    public PluginManager: PluginManager;
     public CommandManager: CommandManager;
-    public ComponentManager: ComponentManager;
     public EventManager: EventManager;
-    public LoopManager: LoopManager;
 
     constructor() {
         super({
@@ -60,35 +54,27 @@ export class KiwiClient extends Client {
             }
         });
 
-        this.setMaxListeners(25);
-
-        this.embed = {
-            color: "#2b2d31"
-        }
-
         this.SlashCommands = new Collection();
         this.PrefixCommands = new Collection();
-        this.events = new Collection();
-        this.buttons = new Collection();
-        this.loops = new Collection();
-
-        // Plugin Manager
-        this.PluginManager = new PluginManager(this);
+        this.Events = new Collection();
 
         // Command Manager
         this.CommandManager = new CommandManager(this);
-
-        // Component Manager
-        this.ComponentManager = new ComponentManager(this);
+        for (var file of readdirSync(resolve(__dirname, "./prefix"))) {
+            let command = require(resolve(__dirname, `./prefix/${file}`));
+            this.CommandManager.loadPrefix(command.default);
+        }
+        for (var file of readdirSync(resolve(__dirname, "./slash"))) {
+            let command = require(resolve(__dirname, `./slash/${file}`));
+            this.CommandManager.loadSlash(command.default);
+        }
 
         // Event Manager
         this.EventManager = new EventManager(this);
-
-        // Loop Manager
-        this.LoopManager = new LoopManager(this);
-
-        // Load all plugins
-        this.PluginManager.loadAll(Plugins);
+        for (var file of readdirSync(resolve(__dirname, "./events"))) {
+            let event = require(resolve(__dirname, `./events/${file}`));
+            this.EventManager.load(event.default);
+        }
 
         this.on(Events.Ready, async () => {
             console.log(`${this.user?.username} is Online`);

@@ -2,10 +2,7 @@ import { REST } from "@discordjs/rest";
 import { Routes } from "discord-api-types/v10";
 import { env } from "../env";
 import { KiwiClient } from "../client";
-import { SlashCommand } from "../types/command";
-
-import { dataSource } from "../datasource";
-import { GuildPluginEntity } from "../entities/GuildPlugin";
+import { PrefixCommand, SlashCommand } from "../types/command";
 
 export class CommandManager {
     public client: KiwiClient;
@@ -14,10 +11,12 @@ export class CommandManager {
         this.client = client;
     }
 
-    load(commands: SlashCommand[]) {
-        for (var command of commands) {
-            this.client.SlashCommands.set(command.config.name, command);
-        }
+    loadPrefix(command: PrefixCommand) {
+        this.client.PrefixCommands.set(command.config.name, command);
+    }
+
+    loadSlash(command: SlashCommand) {
+        this.client.SlashCommands.set(command.config.name, command);
     }
 
     async register(commands: SlashCommand[], guildId: string) {
@@ -48,7 +47,6 @@ export class CommandManager {
     }
 
     async onInteraction(interaction: any) {
-        const GuildPluginsRepository = await dataSource.getRepository(GuildPluginEntity);
 
         if (interaction.isChatInputCommand()) {
 
@@ -57,22 +55,7 @@ export class CommandManager {
             if (!command) return;
 
             try {
-                if (command.plugin) {
-                    var plugin = this.client.PluginManager.plugins.find(plugin => plugin.config.name === command.plugin);
-                    if (!plugin.config.disableable) {
-                        await command.execute(interaction, this.client);
-                    } else {
-                        if (interaction.guild) {
-                            const status = await GuildPluginsRepository.findOne({ where: { guildId: interaction.guild.id, pluginName: command.plugin } });
-                            if (status) {
-                                await command.execute(interaction, this.client);
-                            } else {
-                                await interaction.reply({ content: 'This plugin is disabled!', ephemeral: true });
-                            }
-                        }
-                    }
-                }
-               
+                await command.execute(interaction, this.client);
             } catch (error) {
                 console.error(error);
                 await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
