@@ -1,5 +1,5 @@
 version: "3"
-name: "simple-discord"
+name: "cool-bot"
 
 services:
   app:
