@@ -1,16 +1,16 @@
-import { KiwiClient } from "@/client";
+import { KiwiClient } from "../client";
 import { Message } from "discord.js";
 
 import { 
 	PrefixCommand
-} from "@/types/command";
+} from "../types/command";
 
 /**
  * @type {PrefixCommand}
  */
-export const CommandsPrefix: PrefixCommand = {
+export const command: PrefixCommand = {
 	config: {
-        name: "commands",
+        name: "commands", 
         description: "List of all of my commands",
     },
 

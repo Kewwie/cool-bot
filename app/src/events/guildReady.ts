@@ -1,12 +1,12 @@
 import { Guild } from "discord.js";
 
-import { KiwiClient } from "@/client";
-import { Event, Events } from "@/types/event";
+import { KiwiClient } from "../client";
+import { Event, Events } from "../types/event";
 
 /**
  * @type {Event}
  */
-export default {
+export const event: Event = {
     name: Events.GuildReady,
 
     /**

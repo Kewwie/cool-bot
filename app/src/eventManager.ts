@@ -1,5 +1,5 @@
-import { KiwiClient } from "../client";
-import { Event } from "../types/event";
+import { KiwiClient } from "./client";
+import { Event } from "./types/event";
 
 export class EventManager {
     private client: KiwiClient;

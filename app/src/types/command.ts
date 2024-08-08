@@ -1,5 +1,5 @@
 import { ChatInputCommandInteraction, AutocompleteInteraction, Message } from "discord.js";
-import { KiwiClient } from "@/client";
+import { KiwiClient } from "../client";
 
 export interface PrefixCommand {
     config: {

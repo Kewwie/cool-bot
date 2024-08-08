@@ -3,14 +3,14 @@ import {
     GatewayIntentBits,
     Partials,
     Collection,
-    ColorResolvable,
-    ClientPresenceStatus
+    ColorResolvable
 } from "discord.js";
+
 import { readdirSync } from "fs";
 import { resolve } from "path";
 
-import { CommandManager } from "./managers/command";
-import { EventManager } from "./managers/event";
+import { CommandManager } from "./commandManager";
+import { EventManager } from "./eventManager";
 
 import { SlashCommand, PrefixCommand } from "./types/command";
 import { Event, Events } from "./types/event";
@@ -49,31 +49,29 @@ export class KiwiClient extends Client {
                 Partials.Message,
                 Partials.User,
             ],
-            presence: {
-                status: "online" as ClientPresenceStatus,
-            }
         });
 
+        this.Events = new Collection();
         this.SlashCommands = new Collection();
         this.PrefixCommands = new Collection();
-        this.Events = new Collection();
-
-        // Command Manager
-        this.CommandManager = new CommandManager(this);
-        for (var file of readdirSync(resolve(__dirname, "./prefix"))) {
-            let command = require(resolve(__dirname, `./prefix/${file}`));
-            this.CommandManager.loadPrefix(command.default);
-        }
-        for (var file of readdirSync(resolve(__dirname, "./slash"))) {
-            let command = require(resolve(__dirname, `./slash/${file}`));
-            this.CommandManager.loadSlash(command.default);
-        }
 
         // Event Manager
         this.EventManager = new EventManager(this);
         for (var file of readdirSync(resolve(__dirname, "./events"))) {
-            let event = require(resolve(__dirname, `./events/${file}`));
-            this.EventManager.load(event.default);
+            let { event } = require(resolve(__dirname, `./events/${file}`));
+            this.EventManager.load(event);
+        }
+        this.EventManager.register([...this.Events.values()]);
+
+        // Command Manager
+        this.CommandManager = new CommandManager(this);
+        for (var file of readdirSync(resolve(__dirname, "./prefix"))) {
+            let { command } = require(resolve(__dirname, `./prefix/${file}`));
+            this.CommandManager.loadPrefix(command);
+        }
+        for (var file of readdirSync(resolve(__dirname, "./slash"))) {
+            let { command } = require(resolve(__dirname, `./slash/${file}`));
+            this.CommandManager.loadSlash(command);
         }
 
         this.on(Events.Ready, async () => {

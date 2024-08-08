@@ -2,19 +2,19 @@ import {
 	ChatInputCommandInteraction
 } from "discord.js";
 
-import { KiwiClient } from "@/client";
+import { KiwiClient } from "../client";
 
 import { 
 	CommandTypes,
 	SlashCommandContexts,
 	IntegrationTypes,
     SlashCommand
-} from "@/types/command";
+} from "../types/command";
 
 /**
  * @type {SlashCommand}
  */
-export const AboutSlash: SlashCommand = {
+export const command: SlashCommand = {
 	config: {
         name: "about",
         description: "Some information about me",

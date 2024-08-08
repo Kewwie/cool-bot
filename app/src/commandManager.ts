@@ -1,8 +1,8 @@
 import { REST } from "@discordjs/rest";
 import { Routes } from "discord-api-types/v10";
-import { env } from "../env";
-import { KiwiClient } from "../client";
-import { PrefixCommand, SlashCommand } from "../types/command";
+import { env } from "./env";
+import { KiwiClient } from "./client";
+import { PrefixCommand, SlashCommand } from "./types/command";
 
 export class CommandManager {
     public client: KiwiClient;
@@ -35,15 +35,23 @@ export class CommandManager {
         console.log(`Successfully reloaded ${data.length} (/) commands in ${guildId}`);
     }
 
-    async unregister(guildId: string) {
+    async unregister(guildId?: string) {
         const rest = new REST({ version: '10' }).setToken(env.CLIENT_TOKEN);
 
-        await rest.put(
-            Routes.applicationGuildCommands(env.CLIENT_ID, guildId),
-            { body: [] }
-        )
-
-        console.log(`Successfully removed all (/) commands in ${guildId}`);
+        if (!guildId) {
+            await rest.put(
+                Routes.applicationCommands(env.CLIENT_ID),
+                { body: [] }
+            )
+            console.log(`Successfully removed all (/) commands globally`);
+        }
+        else {
+            await rest.put(
+                Routes.applicationGuildCommands(env.CLIENT_ID, guildId),
+                { body: [] }
+            )
+            console.log(`Successfully removed all (/) commands in ${guildId}`);
+        }
     }
 
     async onInteraction(interaction: any) {
