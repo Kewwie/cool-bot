@@ -1,7 +1,7 @@
 import { Guild } from "discord.js";
 
-import { KiwiClient } from "../client";
-import { Event, Events } from "../types/event";
+import { KiwiClient } from "./app/src/client";
+import { Event, Events } from "./app/src/types/event";
 
 /**
  * @type {Event}

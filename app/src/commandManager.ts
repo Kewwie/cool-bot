@@ -1,8 +1,10 @@
 import { REST } from "@discordjs/rest";
 import { Routes } from "discord-api-types/v10";
+import { Message } from "discord.js";
+
 import { env } from "./env";
 import { KiwiClient } from "./client";
-import { PrefixCommand, SlashCommand } from "./types/command";
+import { PrefixCommand, CommandOptions, SlashCommand } from "./types/command";
 
 export class CommandManager {
     public client: KiwiClient;
@@ -58,7 +60,7 @@ export class CommandManager {
 
         if (interaction.isChatInputCommand()) {
 
-            const command = this.client.SlashCommands.get(interaction.commandName);
+            let command = this.client.SlashCommands.get(interaction.commandName);
 
             if (!command) return;
 
@@ -71,7 +73,7 @@ export class CommandManager {
 
         } else if (interaction.isAutocomplete()) {
 
-            const command = this.client.SlashCommands.get(interaction.commandName);
+            let command = this.client.SlashCommands.get(interaction.commandName);
 
             if (!command) return;
 
@@ -82,6 +84,32 @@ export class CommandManager {
                 await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
             }
             
+        }
+    }
+
+    async onMessage(message: Message) {
+
+        if (message.author.bot) return;
+        if (!message.content.startsWith(env.PREFIX)) return;
+
+        let args = message.content.slice(env.PREFIX.length).trim().split(/ +/);
+        let commandName = args.shift()?.toLowerCase();
+        if (!commandName) return;
+
+        let command = this.client.PrefixCommands.get(commandName);
+        if (!command) return;
+
+        let commandOptions: CommandOptions = {
+            commandName: commandName,
+            auther: message.author.id,
+            args
+        }
+
+        try {
+            await command.execute(message, commandOptions, this.client);
+        } catch (error) {
+            console.error(error);
+            await message.reply('There was an error while executing this command!');
         }
     }
 }

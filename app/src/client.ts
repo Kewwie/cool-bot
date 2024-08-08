@@ -11,6 +11,7 @@ import { resolve } from "path";
 
 import { CommandManager } from "./commandManager";
 import { EventManager } from "./eventManager";
+import { DatabaseManager } from "./databaseManager";
 
 import { SlashCommand, PrefixCommand } from "./types/command";
 import { Event, Events } from "./types/event";
@@ -30,6 +31,7 @@ export class KiwiClient extends Client {
 
     public CommandManager: CommandManager;
     public EventManager: EventManager;
+    public DatabaseManager: DatabaseManager;
 
     constructor() {
         super({
@@ -73,6 +75,12 @@ export class KiwiClient extends Client {
             let { command } = require(resolve(__dirname, `./slash/${file}`));
             this.CommandManager.loadSlash(command);
         }
+        this.on(Events.InteractionCreate, this.CommandManager.onInteraction.bind(this.CommandManager));
+        this.on(Events.MessageCreate, this.CommandManager.onMessage.bind(this.CommandManager));
+
+        // Database Manager
+        this.DatabaseManager = new DatabaseManager(this);
+        this.DatabaseManager.connect();
 
         this.on(Events.Ready, async () => {
             console.log(`${this.user?.username} is Online`);

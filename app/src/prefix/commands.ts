@@ -2,6 +2,7 @@ import { KiwiClient } from "../client";
 import { Message } from "discord.js";
 
 import { 
+    CommandOptions,
 	PrefixCommand
 } from "../types/command";
 
@@ -18,7 +19,8 @@ export const command: PrefixCommand = {
     * @param {ChatInputCommandInteraction} interaction
     * @param {KiwiClient} client
     */
-	async execute(message: Message, client: KiwiClient): Promise<void> {
+	async execute(message: Message, commandOptions: CommandOptions, client: KiwiClient): Promise<void> {
+        console.log(commandOptions.args);
         message.reply("soon");
     }
 }

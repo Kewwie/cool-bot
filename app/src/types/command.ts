@@ -6,7 +6,13 @@ export interface PrefixCommand {
         name: string;
         description?: string;
     };
-    execute: (message: Message, client: KiwiClient) => Promise<void>;
+    execute: (message: Message, commandOptions: CommandOptions, client: KiwiClient) => Promise<void>;
+}
+
+export interface CommandOptions {
+    commandName: string;
+    auther: string;
+    args: string[];
 }
 
 export interface SlashCommand {
