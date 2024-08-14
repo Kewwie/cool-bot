@@ -15,7 +15,8 @@ import {
 /**
  * @type {SlashCommand}
  */
-export const command: SlashCommand = {
+export const Trusted: SlashCommand = {
+    premission_level: 50,
 	config: {
         name: "trusted",
         description: "Trusted commands",
@@ -58,6 +59,44 @@ export const command: SlashCommand = {
     * @param {KiwiClient} client
     */
 	async execute(interaction: ChatInputCommandInteraction, client: KiwiClient): Promise<void> {
-        interaction.reply({ content: "I am a bot", ephemeral: true });
+        var user = interaction.options.getUser("member");
+        if (!user) {
+            interaction.reply({ content: "User not found", ephemeral: true });
+            return;
+        }
+
+        var member = await interaction.guild.members.fetch(user.id);
+        if (!member) {
+            interaction.reply({ content: "Member not found", ephemeral: true });
+            return;
+        }
+
+        var trustedRole = await client.DatabaseManager.getTrustedRole(interaction.guildId);
+        if (!trustedRole && !(await interaction.guild.roles.cache.get(trustedRole))) {
+            interaction.reply({ content: "Trusted role can't be found", ephemeral: true });
+            return;
+        }
+
+        switch (interaction.options.getSubcommand()) {
+            case "add":
+                if (member.roles.cache.has(trustedRole)) {
+                    interaction.reply({ content: `**${user.username}** already has trusted`, ephemeral: true });
+                    
+                } else {
+                    await member.roles.add(trustedRole).catch(() => {});
+                    interaction.reply({ content: `Added trusted to **${user.username}**`, ephemeral: true });
+                }
+                break;
+
+            case "remove":
+                if (!member.roles.cache.has(trustedRole)) {
+                    interaction.reply({ content: `**${user.username}** doesn't have trusted`, ephemeral: true });
+                    
+                } else {
+                    await member.roles.remove(trustedRole).catch(() => {});
+                    interaction.reply({ content: `Removed trusted from **${user.username}**`, ephemeral: true });
+                }
+                break;
+        }
     }
 }

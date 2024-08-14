@@ -64,6 +64,31 @@ export class CommandManager {
 
             if (!command) return;
 
+            if (interaction.guildId) {
+                if (command.premission_level) {
+                    let hasHigherPermission = false;
+
+                    if (await this.client.DatabaseManager.getPermissionLevelById(interaction.guildId, interaction.user.id) >= command.premission_level) {
+                        hasHigherPermission = true;
+                    }
+
+                    interaction.member.roles.cache.forEach(async (role) => {
+                        if (await this.client.DatabaseManager.getPermissionLevelById(interaction.guildId, role.id) >= command.premission_level) {
+                            hasHigherPermission = true;
+                        }
+                    });
+
+                    if (interaction.guild.ownerId === interaction.user.id) {
+                        hasHigherPermission = true;
+                    }
+
+                    if (!hasHigherPermission) {
+                        await interaction.reply({ content: `You need permission level ${command.premission_level} to use this command!`, ephemeral: true });
+                        return;
+                    }
+                }
+            }
+
             try {
                 await command.execute(interaction, this.client);
             } catch (error) {
@@ -103,6 +128,31 @@ export class CommandManager {
             commandName: commandName,
             auther: message.author.id,
             args
+        }
+
+        if (message.guildId) {
+            if (command.premission_level) {
+                let hasHigherPermission = false;
+
+                if (await this.client.DatabaseManager.getPermissionLevelById(message.guildId, message.author.id) >= command.premission_level) {
+                    hasHigherPermission = true;
+                }
+
+                message.member.roles.cache.forEach(async (role) => {
+                    if (await this.client.DatabaseManager.getPermissionLevelById(message.guildId, role.id) >= command.premission_level) {
+                        hasHigherPermission = true;
+                    }
+                });
+
+                if (message.guild.ownerId === message.author.id) {
+                    hasHigherPermission = true;
+                }
+
+                if (!hasHigherPermission) {
+                    await message.reply({ content: `You need permission level ${command.premission_level} to use this command!`});
+                    return;
+                }
+            }
         }
 
         try {

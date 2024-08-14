@@ -14,7 +14,7 @@ import {
 /**
  * @type {SlashCommand}
  */
-export const command: SlashCommand = {
+export const About: SlashCommand = {
 	config: {
         name: "about",
         description: "Some information about me",

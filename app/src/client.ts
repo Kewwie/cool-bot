@@ -6,8 +6,9 @@ import {
     ColorResolvable
 } from "discord.js";
 
-import { readdirSync } from "fs";
-import { resolve } from "path";
+import { ClientEvents } from "./events";
+import { ClientPrefixCommands } from "./prefixCommands";
+import { ClientSlashCommands } from "./slashCommands";
 
 import { CommandManager } from "./commandManager";
 import { EventManager } from "./eventManager";
@@ -59,20 +60,17 @@ export class KiwiClient extends Client {
 
         // Event Manager
         this.EventManager = new EventManager(this);
-        for (var file of readdirSync(resolve(__dirname, "./events"))) {
-            let { event } = require(resolve(__dirname, `./events/${file}`));
+        for (let event of ClientEvents) {
             this.EventManager.load(event);
         }
         this.EventManager.register([...this.Events.values()]);
 
         // Command Manager
         this.CommandManager = new CommandManager(this);
-        for (var file of readdirSync(resolve(__dirname, "./prefix"))) {
-            let { command } = require(resolve(__dirname, `./prefix/${file}`));
+        for (let command of ClientPrefixCommands) {
             this.CommandManager.loadPrefix(command);
         }
-        for (var file of readdirSync(resolve(__dirname, "./slash"))) {
-            let { command } = require(resolve(__dirname, `./slash/${file}`));
+        for (let command of ClientSlashCommands) {
             this.CommandManager.loadSlash(command);
         }
         this.on(Events.InteractionCreate, this.CommandManager.onInteraction.bind(this.CommandManager));
@@ -80,7 +78,6 @@ export class KiwiClient extends Client {
 
         // Database Manager
         this.DatabaseManager = new DatabaseManager(this);
-        this.DatabaseManager.connect();
 
         this.on(Events.Ready, async () => {
             console.log(`${this.user?.username} is Online`);

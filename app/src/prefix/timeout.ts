@@ -9,10 +9,11 @@ import {
 /**
  * @type {PrefixCommand}
  */
-export const Commands: PrefixCommand = {
+export const Timeout: PrefixCommand = {
+    premission_level: 100,
 	config: {
-        name: "commands", 
-        description: "List of all of my commands",
+        name: "timeout", 
+        description: "Timeout a user",
     },
 
 	/**
@@ -20,7 +21,9 @@ export const Commands: PrefixCommand = {
     * @param {KiwiClient} client
     */
 	async execute(message: Message, commandOptions: CommandOptions, client: KiwiClient): Promise<void> {
-        console.log(commandOptions.args);
+        var memberId = commandOptions.args[0];
+        var member = message.guild.members.cache.get(memberId);
+        console.log(commandOptions.args[0]);
         message.reply("soon");
     }
 }

@@ -5,7 +5,7 @@ import { Event, Events } from "../types/event";
 /**
  * @type {Event}
  */
-export const event: Event = {
+export const Ready: Event = {
     name: Events.Ready,
 
     /**

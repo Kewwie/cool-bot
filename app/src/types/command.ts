@@ -2,6 +2,7 @@ import { ChatInputCommandInteraction, AutocompleteInteraction, Message } from "d
 import { KiwiClient } from "../client";
 
 export interface PrefixCommand {
+    premission_level?: number;
     config: {
         name: string;
         description?: string;
@@ -16,6 +17,7 @@ export interface CommandOptions {
 }
 
 export interface SlashCommand {
+    premission_level?: number;
     config: {
         type: CommandTypes;
         name: string;

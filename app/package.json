@@ -2,7 +2,7 @@
   "name": "coolbot",
   "version": "1.0.0",
   "scripts": {
-    "dev": "npm run build && npm run start",
+    "dev": "nodemon --exec ts-node src/index.ts",
     "build": "tsc",
     "start": "node dist/index.js"
   },

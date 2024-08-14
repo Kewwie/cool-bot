@@ -15,7 +15,8 @@ import {
 /**
  * @type {SlashCommand}
  */
-export const command: SlashCommand = {
+export const Config: SlashCommand = {
+    premission_level: 500,
 	config: {
         name: "config",
         description: "Config commands",
@@ -43,10 +44,10 @@ export const command: SlashCommand = {
                 description: "Remove the trusted role from a user",
                 options: [
                     {
-                        type: OptionTypes.STRING,
+                        type: OptionTypes.NUMBER,
                         name: "level",
                         description: "Pick a level from 1-500",
-                        required: true
+                        required: false
                     },
                     {
                         type: OptionTypes.USER,
@@ -80,10 +81,44 @@ export const command: SlashCommand = {
             }
 
             case "permission-level": {
-                let level = await interaction.options.getString("level");
+                let level = await interaction.options.getNumber("level");
                 let member = await interaction.options.getUser("member");
                 let role = await interaction.options.getRole("role");
 
+                if (level && !member && !role) {
+                    interaction.reply({ content: "You need to provide a member or role", ephemeral: true });
+                } else
+
+                if (level && member) {
+                    await client.DatabaseManager.setPermissionLevelById(interaction.guildId, member.id, level);
+                    interaction.reply({ content: `The permission level for **${member.username}** has been set to **${level}**`, ephemeral: true });
+                } else
+                
+                if (level && role) {
+                    await client.DatabaseManager.setPermissionLevelById(interaction.guildId, role.id, level);
+                    interaction.reply({ content: `The permission level for **${role.name}** has been set to **${level}**`, ephemeral: true });
+                } else 
+
+                if (!level) {
+                    let userLevels = await client.DatabaseManager.getPermissionLevels(interaction.guildId);
+                    let userLevelsString = new String();
+                    for (let [key, value] of Object.entries(userLevels)) {
+                        let keyMember = await interaction.guild.members.fetch(key);
+                        let keyRole = await interaction.guild.roles.fetch(key);
+                        let name = new String();
+
+                        if (keyMember) {
+                            name = keyMember.user.username;
+                        } else
+
+                        if (keyRole) {
+                            name = keyRole.name;
+                        }
+
+                        userLevelsString += `**${name}** - ${value}\n`;
+                    }
+                    interaction.reply({ content: `# Permission Levels \n${userLevelsString}`, ephemeral: true });
+                }
                 break;
             }
         }

@@ -9,10 +9,10 @@ export class ConfigEntity {
     guildId: string;
 
     @Column("trusted_role")
-    trustedRole: string;
+    trustedRole: string = null;
 
     @Column("permission_levels")
     permissionLevels: {
         [key: string]: number;
-    };
+    } = {};
 }
