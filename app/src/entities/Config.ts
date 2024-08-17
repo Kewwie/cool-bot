@@ -15,4 +15,9 @@ export class ConfigEntity {
     permissionLevels: {
         [key: string]: number;
     } = {};
+
+    @Column("level_role")
+    levelRole: {
+        [key: string]: number;
+    } = {};
 }
