@@ -15,11 +15,11 @@ export class UserLevelEntity {
     userName: string;
 
     @Column("level")
-    level: number;
+    level: number = 0;
 
     @Column("xp")
-    xp: number;
+    xp: number = 0;
 
     @Column("last_updated")
-    lastUpdated: Date;
+    lastUpdated: Date = new Date();
 }
