@@ -1,17 +1,24 @@
 import { Entity, ObjectIdColumn, ObjectId, Column } from 'typeorm';
+import { IsNotEmpty, IsDefined } from 'class-validator';
 
 @Entity("user_levels")
 export class UserLevelEntity {
     @ObjectIdColumn()
     id: ObjectId;
 
-    @Column("guild_id")
+    @Column({ name: "guild_id", nullable: false })
+    @IsNotEmpty()
+    @IsDefined()
     guildId: string;
 
-    @Column("user_id")
+    @Column({ name: "user_id", nullable: false })
+    @IsNotEmpty()
+    @IsDefined()
     userId: string;
 
-    @Column("user_name")
+    @Column({ name: "user_name", nullable: false })
+    @IsNotEmpty()
+    @IsDefined()
     userName: string;
 
     @Column("level")
