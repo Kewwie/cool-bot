@@ -1,24 +1,17 @@
-import { Entity, ObjectIdColumn, ObjectId, Column } from 'typeorm';
-import { IsNotEmpty, IsDefined } from 'class-validator';
+import { Entity, ObjectIdColumn, ObjectId, Column, BeforeInsert, BeforeUpdate } from 'typeorm';
 
 @Entity("user_levels")
 export class UserLevelEntity {
     @ObjectIdColumn()
     id: ObjectId;
 
-    @Column({ name: "guild_id", nullable: false })
-    @IsNotEmpty()
-    @IsDefined()
+    @Column("guild_id")
     guildId: string;
 
-    @Column({ name: "user_id", nullable: false })
-    @IsNotEmpty()
-    @IsDefined()
+    @Column("user_id")
     userId: string;
 
-    @Column({ name: "user_name", nullable: false })
-    @IsNotEmpty()
-    @IsDefined()
+    @Column("user_name")
     userName: string;
 
     @Column("level")
@@ -28,5 +21,11 @@ export class UserLevelEntity {
     xp: number = 0;
 
     @Column("last_updated")
-    lastUpdated: Date = new Date();
+    lastUpdated: Date;
+
+    @BeforeUpdate()
+    @BeforeInsert()
+    updateLastUpdated() {
+        this.lastUpdated = new Date();
+    }
 }

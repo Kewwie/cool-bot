@@ -14,8 +14,11 @@ export const MessageCreate: Event = {
     */
     async execute(client: KiwiClient, message: Message) {
         let xpGain = 50;
-
+        
         let userLevel = await client.DatabaseManager.getUserLevel(message.guild.id, message.author.id);
+        if (!userLevel) {
+            userLevel = await client.DatabaseManager.createUserLevel(message.guild.id, message.author.id, message.author.username);
+        }
         let xp = userLevel.xp + xpGain;
         let neededXp = await client.calculateXp(userLevel.level + 1) - xp;
 
@@ -24,7 +27,6 @@ export const MessageCreate: Event = {
         }
 
         userLevel.xp = xp;
-        userLevel.lastUpdated = new Date();
         await client.DatabaseManager.saveUserLevel(userLevel);
     }
 }

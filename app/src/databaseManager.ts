@@ -68,26 +68,19 @@ export class DatabaseManager {
         return config.trustedRole;
     }
 
-    private async createLevelForUser(guildId: string, userId: string) {
+    public async createUserLevel(guildId: string, userId: string, userName: string) {
         let userLevel = new UserLevelEntity();
         userLevel.guildId = guildId;
         userLevel.userId = userId;
-        userLevel.userName = await this.client.users.fetch(userId).then(user => user.username);
-        await this.repositories.levels.save(userLevel);
-        return await this.repositories.levels.findOne({ where: { guildId: guildId, userId: userId } });
-    }
-
-    private async getLevelForUser(guildId: string, userId: string) {
-        let userLevel = await this.repositories.levels.findOne({ where: { guildId: guildId, userId: userId } });
-        if (!userLevel) userLevel = await this.createLevelForUser(guildId, userId);
-        return userLevel;
+        userLevel.userName = userName;
+        return await this.repositories.levels.save(userLevel);
     }
 
     public async getUserLevel(guildId: string, userId: string) {
-        return await this.getLevelForUser(guildId, userId);
+        return await this.repositories.levels.findOne({ where: { guildId: guildId, userId: userId } });
     }
 
     public async saveUserLevel(userLevel: UserLevelEntity) {
-        await this.repositories.levels.save(userLevel);
+        return await this.repositories.levels.save(userLevel);
     }
 }
