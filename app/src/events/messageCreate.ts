@@ -13,7 +13,7 @@ export const MessageCreate: Event = {
     * @param {Guild} guild
     */
     async execute(client: KiwiClient, message: Message) {
-        let xpGain = 50;
+        let xpGain = 100;
         
         let userLevel = await client.DatabaseManager.getUserLevel(message.guild.id, message.author.id);
         if (!userLevel) {
