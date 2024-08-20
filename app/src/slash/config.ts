@@ -112,12 +112,12 @@ export const Config: SlashCommand = {
                     interaction.reply({ content: `# Permission Levels \n${userLevelsString}`, ephemeral: true });
                 } else
 
-                if (level <= 0 || level > 1000) {
-                    interaction.reply({ content: "The level must be between 1-1000", ephemeral: true });
-                } else
-
                 if (!member && !role) {
                     interaction.reply({ content: "You need to provide a member or role", ephemeral: true });
+                } else
+
+                if (level <= 0 || level > 1000) {
+                    interaction.reply({ content: "The level must be between 1-1000", ephemeral: true });
                 } else
 
                 if (member) {
