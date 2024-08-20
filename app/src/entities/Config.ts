@@ -20,4 +20,10 @@ export class ConfigEntity {
     levelReward: {
         [key: number]: string;
     } = {};
+
+    @Column("level_up_message")
+    levelUpMessage: string = "**Congrats {userMention} you have leveled up to level {level}!**";
+
+    @Column("level_up_channel")
+    levelUpChannel: string = null;
 }

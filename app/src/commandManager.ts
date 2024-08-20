@@ -69,7 +69,7 @@ export class CommandManager {
                 if (command.premission_level) {
                     let hasHigherPermission = false;
 
-                    if (guildConfig.permissionLevels) {
+                    if (guildConfig?.permissionLevels) {
 
                         if (guildConfig.permissionLevels[interaction.userId] >= command.premission_level) {
                             hasHigherPermission = true;
@@ -139,7 +139,7 @@ export class CommandManager {
             if (command.premission_level) {
                 let hasHigherPermission = false;
 
-                if (guildConfig.permissionLevels) {
+                if (guildConfig?.permissionLevels) {
                     if (guildConfig.permissionLevels[message.author.id] >= command.premission_level) {
                         hasHigherPermission = true;
                     }

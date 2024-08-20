@@ -13,20 +13,55 @@ export const MessageCreate: Event = {
     * @param {Guild} guild
     */
     async execute(client: KiwiClient, message: Message) {
+        let guildConfig = await client.DatabaseManager.getGuildConfig(message.guild.id);
         let xpGain = 100;
         
         let userLevel = await client.DatabaseManager.getUserLevel(message.guild.id, message.author.id);
         if (!userLevel) {
             userLevel = await client.DatabaseManager.createUserLevel(message.guild.id, message.author.id, message.author.username);
         }
-        let xp = userLevel.xp + xpGain;
-        let neededXp = await client.calculateXp(userLevel.level + 1) - xp;
+        userLevel.xp += xpGain;
+        let neededXp = await client.calculateXp(userLevel.level + 1) - userLevel.xp;
 
         if (neededXp <= 0) {
             userLevel.level++;
-        }
 
-        userLevel.xp = xp;
+            if (guildConfig?.levelUpMessage) {
+                let channel;
+                if (guildConfig.levelUpChannel) {
+                    channel = message.guild.channels.fetch(guildConfig.levelUpChannel);
+                } else {
+                    channel = message.channel;
+                }
+
+                channel.send(
+                    guildConfig.levelUpMessage
+                        .replace("{userMention}", `<@${message.author.id}>`)
+                        .replace("{userName}", message.author.username)
+                        .replace("{userId}", message.author.id.toString())
+                        .replace("{level}", userLevel.level.toString())
+                        .replace("{xp}", userLevel.xp.toString())
+                );
+            }
+
+            if (guildConfig?.levelReward) {
+                let closestReward = Object.keys(guildConfig.levelReward)
+                    .map(Number)
+                    .filter(level => level <= userLevel.level)
+                    .sort((a, b) => b - a)[0];
+
+                if (closestReward) {
+                    let newRoleId = guildConfig.levelReward[closestReward];
+                    Object.values(guildConfig.levelReward).forEach(async (roleId) => {
+                        if (roleId === newRoleId) return;
+                        if (message.member?.roles.cache.has(roleId)) {
+                            message.member?.roles.remove(roleId).catch(console.error);
+                        }
+                    })
+                    message.member?.roles.add(newRoleId).catch(console.error);
+                }
+            }
+        }
         await client.DatabaseManager.saveUserLevel(userLevel);
     }
 }
