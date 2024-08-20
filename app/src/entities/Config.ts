@@ -16,6 +16,11 @@ export class ConfigEntity {
         [key: string]: number;
     } = {};
 
+    @Column("command_levels")
+    commandLevels: {
+        [key: string]: number;
+    } = {};
+
     @Column("level_reward")
     levelReward: {
         [key: number]: string;
