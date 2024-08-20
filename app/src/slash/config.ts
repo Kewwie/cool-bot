@@ -46,7 +46,7 @@ export const Config: SlashCommand = {
                     {
                         type: OptionTypes.NUMBER,
                         name: "level",
-                        description: "Pick a level from 1-500",
+                        description: "Pick a level from 1-1000",
                         required: false
                     },
                     {
@@ -91,22 +91,6 @@ export const Config: SlashCommand = {
                 let member = await interaction.options.getUser("member");
                 let role = await interaction.options.getRole("role");
 
-                if (level && !member && !role) {
-                    interaction.reply({ content: "You need to provide a member or role", ephemeral: true });
-                } else
-
-                if (level && member) {
-                    guildConfig.permissionLevels[member.id] = level;
-                    await client.DatabaseManager.saveGuildConfig(guildConfig);
-                    interaction.reply({ content: `The permission level for **${member.username}** has been set to **${level}**`, ephemeral: true });
-                } else
-                
-                if (level && role) {
-                    guildConfig.permissionLevels[role.id] = level;
-                    await client.DatabaseManager.saveGuildConfig(guildConfig);
-                    interaction.reply({ content: `The permission level for **${role.name}** has been set to **${level}**`, ephemeral: true });
-                } else 
-
                 if (!level) {
                     let userLevels = guildConfig.permissionLevels;
                     let userLevelsString = new String();
@@ -126,7 +110,27 @@ export const Config: SlashCommand = {
                         userLevelsString += `**${name}** - ${value}\n`;
                     }
                     interaction.reply({ content: `# Permission Levels \n${userLevelsString}`, ephemeral: true });
-                }
+                } else
+
+                if (level <= 0 || level > 1000) {
+                    interaction.reply({ content: "The level must be between 1-1000", ephemeral: true });
+                } else
+
+                if (!member && !role) {
+                    interaction.reply({ content: "You need to provide a member or role", ephemeral: true });
+                } else
+
+                if (member) {
+                    guildConfig.permissionLevels[member.id] = level;
+                    await client.DatabaseManager.saveGuildConfig(guildConfig);
+                    interaction.reply({ content: `The permission level for **${member.username}** has been set to **${level}**`, ephemeral: true });
+                } else
+                
+                if (role) {
+                    guildConfig.permissionLevels[role.id] = level;
+                    await client.DatabaseManager.saveGuildConfig(guildConfig);
+                    interaction.reply({ content: `The permission level for **${role.name}** has been set to **${level}**`, ephemeral: true });
+                } 
                 break;
             }
         }
