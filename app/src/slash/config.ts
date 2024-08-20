@@ -41,7 +41,7 @@ export const Config: SlashCommand = {
             {
                 type: OptionTypes.SUB_COMMAND,
                 name: "permission-level",
-                description: "Remove the trusted role from a user",
+                description: "Set a role or user's permission level",
                 options: [
                     {
                         type: OptionTypes.NUMBER,
@@ -53,6 +53,25 @@ export const Config: SlashCommand = {
                         type: OptionTypes.USER,
                         name: "member",
                         description: "The user to set the permission level for",
+                        required: false
+                    },
+                    {
+                        type: OptionTypes.ROLE,
+                        name: "role",
+                        description: "The role to set the permission level for",
+                        required: false
+                    },
+                ]
+            },
+            {
+                type: OptionTypes.SUB_COMMAND,
+                name: "level-rewards",
+                description: "Add or remove a role for a level",
+                options: [
+                    {
+                        type: OptionTypes.NUMBER,
+                        name: "level",
+                        description: "Pick a level from 1-1000",
                         required: false
                     },
                     {
@@ -93,23 +112,29 @@ export const Config: SlashCommand = {
 
                 if (!level) {
                     let userLevels = guildConfig.permissionLevels;
-                    let userLevelsString = new String();
-                    for (let [key, value] of Object.entries(userLevels)) {
-                        let keyMember = await interaction.guild.members.fetch(key);
-                        let keyRole = await interaction.guild.roles.fetch(key);
-                        let name = new String();
+                    if (!userLevels) {
+                        let userLevelsString = new String();
+                        for (let [key, value] of Object.entries(userLevels)) {
+                            let keyMember = await interaction.guild.members.fetch(key);
+                            let keyRole = await interaction.guild.roles.fetch(key);
+                            let name = new String();
 
-                        if (keyMember) {
-                            name = keyMember.user.username;
-                        } else
+                            if (keyMember) {
+                                name = keyMember.user.username;
+                            } else
 
-                        if (keyRole) {
-                            name = keyRole.name;
+                            if (keyRole) {
+                                name = keyRole.name;
+                            }
+
+                            userLevelsString += `**${name}** - ${value}\n`;
                         }
+                        interaction.reply({ content: `# Permission Levels \n${userLevelsString}`, ephemeral: true });
+                    } else 
 
-                        userLevelsString += `**${name}** - ${value}\n`;
+                    if (!userLevels) {
+                        interaction.reply({ content: "No permission levels have been set", ephemeral: true });
                     }
-                    interaction.reply({ content: `# Permission Levels \n${userLevelsString}`, ephemeral: true });
                 } else
 
                 if (!member && !role) {
@@ -130,6 +155,41 @@ export const Config: SlashCommand = {
                     guildConfig.permissionLevels[role.id] = level;
                     await client.DatabaseManager.saveGuildConfig(guildConfig);
                     interaction.reply({ content: `The permission level for **${role.name}** has been set to **${level}**`, ephemeral: true });
+                } 
+                break;
+            }
+
+            case "level-rewards": {
+                let level = await interaction.options.getNumber("level");
+                let role = await interaction.options.getRole("role");
+
+                if (!level) {
+                    let userRewards = guildConfig.permissionLevels;
+                    if (userRewards) {
+                        let userRewardsString = new String();
+                        for (let [key, value] of Object.entries(userRewards)) {
+                            userRewardsString += `**Level ${key}** - <@&${value}>\n`;
+                        }
+                        interaction.reply({ content: `# Level Rewards \n${userRewardsString}`, ephemeral: true });
+                    } else 
+
+                    if (!userRewards) {
+                        interaction.reply({ content: "No level rewards have been set", ephemeral: true });
+                    }
+                } else
+
+                if (!role) {
+                    interaction.reply({ content: "You need to provide a role", ephemeral: true });
+                } else
+
+                if (level <= 0 || level > 200) {
+                    interaction.reply({ content: "The level must be between 1-200", ephemeral: true });
+                } else
+                
+                if (role) {
+                    guildConfig.permissionLevels[role.id] = level;
+                    await client.DatabaseManager.saveGuildConfig(guildConfig);
+                    interaction.reply({ content: `The level reward for level **${level}** has been set to **<@&${role.id}>**`, ephemeral: true });
                 } 
                 break;
             }
