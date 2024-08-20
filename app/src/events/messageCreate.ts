@@ -20,6 +20,8 @@ export const MessageCreate: Event = {
         if (!userLevel) {
             userLevel = await client.DatabaseManager.createUserLevel(message.guild.id, message.author.id, message.author.username);
         }
+
+        if (new Date() < new Date(userLevel.lastUpdated.getTime() + 60000)) return;
         userLevel.xp += xpGain;
         let neededXp = await client.calculateXp(userLevel.level + 1) - userLevel.xp;
 
