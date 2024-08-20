@@ -26,7 +26,7 @@ export const Profile: PrefixCommand = {
             message.author;
         var userLevel = await client.DatabaseManager.getUserLevel(message.guild.id, user.id);
         var levelXp = userLevel.xp - await client.calculateXp(userLevel.level);
-        var neededXp = await client.calculateXp(userLevel.level + 1) - userLevel.xp;
+        var neededXp = await client.calculateXp(userLevel.level + 1) - await client.calculateXp(userLevel.level);
 
         var profileDescription = "";
         profileDescription += `**Rank:** Soon\n`;
