@@ -71,11 +71,17 @@ export const Config: SlashCommand = {
     * @param {KiwiClient} client
     */
 	async execute(interaction: ChatInputCommandInteraction, client: KiwiClient): Promise<void> {
+        let guildConfig = await client.DatabaseManager.getGuildConfig(interaction.guildId);
+        if (!guildConfig) {
+            guildConfig = await client.DatabaseManager.createGuildConfig(interaction.guildId);
+        }
+
         switch (interaction.options.getSubcommand()) {
             case "trusted-role": {
                 let role = await interaction.options.getRole("role");
 
-                await client.DatabaseManager.setTrustedRole(interaction.guildId, role.id);
+                guildConfig.trustedRole = role.id;
+                await client.DatabaseManager.saveGuildConfig(guildConfig);
                 interaction.reply({ content: `The trusted role has been set to ${role}`, ephemeral: true });
                 break;
             }
@@ -90,17 +96,19 @@ export const Config: SlashCommand = {
                 } else
 
                 if (level && member) {
-                    await client.DatabaseManager.setPermissionLevelById(interaction.guildId, member.id, level);
+                    guildConfig.permissionLevels[member.id] = level;
+                    await client.DatabaseManager.saveGuildConfig(guildConfig);
                     interaction.reply({ content: `The permission level for **${member.username}** has been set to **${level}**`, ephemeral: true });
                 } else
                 
                 if (level && role) {
-                    await client.DatabaseManager.setPermissionLevelById(interaction.guildId, role.id, level);
+                    guildConfig.permissionLevels[role.id] = level;
+                    await client.DatabaseManager.saveGuildConfig(guildConfig);
                     interaction.reply({ content: `The permission level for **${role.name}** has been set to **${level}**`, ephemeral: true });
                 } else 
 
                 if (!level) {
-                    let userLevels = await client.DatabaseManager.getPermissionLevels(interaction.guildId);
+                    let userLevels = guildConfig.permissionLevels;
                     let userLevelsString = new String();
                     for (let [key, value] of Object.entries(userLevels)) {
                         let keyMember = await interaction.guild.members.fetch(key);

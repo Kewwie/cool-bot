@@ -94,6 +94,6 @@ export class KiwiClient extends Client {
     }
 
     public async calculateXp(level: number) {
-        return 50 * Math.pow(level, 2) + 50 * level;
+        return 100 * Math.pow(level, 2) + 50 * level;
     }
 };

@@ -17,7 +17,7 @@ import {
  */
 export const Calculate: SlashCommand = {
 	config: {
-        name: "Calculate",
+        name: "calculate",
         description: "Calculate Commands",
         type: CommandTypes.CHAT_INPUT,
         default_member_permissions: null,
@@ -38,6 +38,8 @@ export const Calculate: SlashCommand = {
     * @param {KiwiClient} client
     */
 	async execute(interaction: ChatInputCommandInteraction, client: KiwiClient): Promise<void> {
-        interaction.reply({ content: "I am a bot", ephemeral: true });
+        let level = interaction.options.getInteger("level");
+        let xp = await client.calculateXp(level);
+        interaction.reply({ content: `You need **${xp}** xp to achive level **${level}**`, ephemeral: true });
     }
 }

@@ -65,15 +65,16 @@ export class CommandManager {
             if (!command) return;
 
             if (interaction.guildId) {
+                let guildConfig = await this.client.DatabaseManager.getGuildConfig(interaction.guildId);
                 if (command.premission_level) {
                     let hasHigherPermission = false;
 
-                    if (await this.client.DatabaseManager.getPermissionLevelById(interaction.guildId, interaction.user.id) >= command.premission_level) {
+                    if (guildConfig.permissionLevels[interaction.userId] >= command.premission_level) {
                         hasHigherPermission = true;
                     }
 
                     interaction.member.roles.cache.forEach(async (role) => {
-                        if (await this.client.DatabaseManager.getPermissionLevelById(interaction.guildId, role.id) >= command.premission_level) {
+                        if (guildConfig.permissionLevels[role.id] >= command.premission_level) {
                             hasHigherPermission = true;
                         }
                     });
@@ -131,15 +132,16 @@ export class CommandManager {
         }
 
         if (message.guildId) {
+            let guildConfig = await this.client.DatabaseManager.getGuildConfig(message.guildId);
             if (command.premission_level) {
                 let hasHigherPermission = false;
 
-                if (await this.client.DatabaseManager.getPermissionLevelById(message.guildId, message.author.id) >= command.premission_level) {
+                if (guildConfig.permissionLevels[message.author.id] >= command.premission_level) {
                     hasHigherPermission = true;
                 }
 
                 message.member.roles.cache.forEach(async (role) => {
-                    if (await this.client.DatabaseManager.getPermissionLevelById(message.guildId, role.id) >= command.premission_level) {
+                    if (guildConfig.permissionLevels[role.id] >= command.premission_level) {
                         hasHigherPermission = true;
                     }
                 });

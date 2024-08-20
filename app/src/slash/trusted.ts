@@ -71,29 +71,29 @@ export const Trusted: SlashCommand = {
             return;
         }
 
-        var trustedRole = await client.DatabaseManager.getTrustedRole(interaction.guildId);
-        if (!trustedRole && !(await interaction.guild.roles.cache.get(trustedRole))) {
+        var guildConfig = await client.DatabaseManager.getGuildConfig(interaction.guildId);
+        if (!guildConfig.trustedRole && !(await interaction.guild.roles.cache.get(guildConfig.trustedRole))) {
             interaction.reply({ content: "Trusted role can't be found", ephemeral: true });
             return;
         }
 
         switch (interaction.options.getSubcommand()) {
             case "add":
-                if (member.roles.cache.has(trustedRole)) {
+                if (member.roles.cache.has(guildConfig.trustedRole)) {
                     interaction.reply({ content: `**${user.username}** already has trusted`, ephemeral: true });
                     
                 } else {
-                    await member.roles.add(trustedRole).catch(() => {});
+                    await member.roles.add(guildConfig.trustedRole).catch(() => {});
                     interaction.reply({ content: `Added trusted to **${user.username}**`, ephemeral: true });
                 }
                 break;
 
             case "remove":
-                if (!member.roles.cache.has(trustedRole)) {
+                if (!member.roles.cache.has(guildConfig.trustedRole)) {
                     interaction.reply({ content: `**${user.username}** doesn't have trusted`, ephemeral: true });
                     
                 } else {
-                    await member.roles.remove(trustedRole).catch(() => {});
+                    await member.roles.remove(guildConfig.trustedRole).catch(() => {});
                     interaction.reply({ content: `Removed trusted from **${user.username}**`, ephemeral: true });
                 }
                 break;

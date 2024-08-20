@@ -28,45 +28,19 @@ export class DatabaseManager {
         }
     }
 
-    private async createConfigForGuild(guildId: string) {
+    public async createGuildConfig(guildId: string) {
         let config = new ConfigEntity();
         config.guildId = guildId;
-        await this.repositories.config.save(config);
+        return await this.repositories.config.save(config);
+    }
+
+    public async getGuildConfig(guildId: string) {
         return await this.repositories.config.findOne({ where: { guildId: guildId } });
     }
 
-    private async getConfigForGuild(guildId: string) {
-        let config = await this.repositories.config.findOne({ where: { guildId: guildId } });
-        if (!config) config = await this.createConfigForGuild(guildId);
-        return config;
-    }
-
-    public async getPermissionLevelById(guildId: string, id: string) {
-        let config = await this.getConfigForGuild(guildId);
-        return config.permissionLevels[id];
-    }
-
-    public async setPermissionLevelById(guildId: string, id: string, level: number) {
-        let config = await this.getConfigForGuild(guildId);
-        config.permissionLevels[id] = level;
-        await this.repositories.config.save(config);
-    }
-
-    public async getPermissionLevels(guildId: string) {
-        let config = await this.getConfigForGuild(guildId);
-        return config.permissionLevels;
-    }
-
-    public async setTrustedRole(guildId: string, roleId: string) {
-        let config = await this.getConfigForGuild(guildId);
-        config.trustedRole = roleId;
-        await this.repositories.config.save(config);
-    }
-
-    public async getTrustedRole(guildId: string) {
-        let config = await this.getConfigForGuild(guildId);
-        return config.trustedRole;
-    }
+    public async saveGuildConfig(config: ConfigEntity) {
+        return await this.repositories.config.save(config);
+    }    
 
     public async createUserLevel(guildId: string, userId: string, userName: string) {
         let userLevel = new UserLevelEntity();
