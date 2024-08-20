@@ -25,6 +25,9 @@ export const Profile: PrefixCommand = {
             await client.getRepliedUser(message) ||
             message.author;
         var userLevel = await client.DatabaseManager.getUserLevel(message.guild.id, user.id);
+        if (!userLevel) {
+            message.reply("User has no profile");
+        }
         var levelXp = userLevel.xp - await client.calculateXp(userLevel.level);
         var neededXp = await client.calculateXp(userLevel.level + 1) - await client.calculateXp(userLevel.level);
 
