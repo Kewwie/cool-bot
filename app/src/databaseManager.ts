@@ -86,4 +86,8 @@ export class DatabaseManager {
     public async getUserLevel(guildId: string, userId: string) {
         return await this.getLevelForUser(guildId, userId);
     }
+
+    public async saveUserLevel(userLevel: UserLevelEntity) {
+        await this.repositories.levels.save(userLevel);
+    }
 }

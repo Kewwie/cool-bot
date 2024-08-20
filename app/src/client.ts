@@ -92,4 +92,8 @@ export class KiwiClient extends Client {
             this.CommandManager.register([...this.SlashCommands.values()], guild.id);
         });
     }
+
+    public async calculateXp(level: number) {
+        return 50 * Math.pow(level, 2) + 50 * level;
+    }
 };
