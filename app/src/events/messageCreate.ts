@@ -29,7 +29,7 @@ export const MessageCreate: Event = {
             if (guildConfig?.levelUpMessage) {
                 let channel;
                 if (guildConfig.levelUpChannel) {
-                    channel = message.guild.channels.fetch(guildConfig.levelUpChannel);
+                    channel = await message.guild.channels.fetch(guildConfig.levelUpChannel);
                 } else {
                     channel = message.channel;
                 }
