@@ -3,7 +3,8 @@ import {
     GatewayIntentBits,
     Partials,
     Collection,
-    ColorResolvable
+    ColorResolvable,
+    Message
 } from "discord.js";
 
 import { ClientEvents } from "./events";
@@ -95,5 +96,32 @@ export class KiwiClient extends Client {
 
     public async calculateXp(level: number) {
         return 100 * Math.pow(level, 2) + 50 * level;
+    }
+
+    public capitalize(string: string) {
+        return string.charAt(0).toUpperCase() + string.slice(1);
+    }
+
+    public async getUserFromArg(arg: string) {
+        if (!arg) return null;
+        var user;
+
+        if (arg.includes("@") || arg.match(/^[0-9]+$/)) {
+            user = await this.users.fetch(
+                arg
+                    .replace("<@", "")
+                    .replace("!", "")
+                    .replace(">", "")
+            );
+        } else {
+            user = await this.users.cache.find(u => u.username.toLowerCase() === arg.toLowerCase());
+        }
+        return user;
+    }
+
+    public async getRepliedUser(message: Message) {
+        if (!message.reference) return null;
+        let repliedMessage = await message.channel.messages.fetch(message.reference.messageId);
+        return await this.users.fetch(repliedMessage.author.id);
     }
 };
