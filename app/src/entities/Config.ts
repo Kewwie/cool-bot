@@ -16,8 +16,8 @@ export class ConfigEntity {
         [key: string]: number;
     } = {};
 
-    @Column("level_role")
-    levelRole: {
-        [key: string]: number;
+    @Column("level_reward")
+    levelReward: {
+        [key: number]: string;
     } = {};
 }

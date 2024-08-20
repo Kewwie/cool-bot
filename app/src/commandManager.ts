@@ -69,15 +69,18 @@ export class CommandManager {
                 if (command.premission_level) {
                     let hasHigherPermission = false;
 
-                    if (guildConfig.permissionLevels[interaction.userId] >= command.premission_level) {
-                        hasHigherPermission = true;
-                    }
+                    if (guildConfig.permissionLevels) {
 
-                    interaction.member.roles.cache.forEach(async (role) => {
-                        if (guildConfig.permissionLevels[role.id] >= command.premission_level) {
+                        if (guildConfig.permissionLevels[interaction.userId] >= command.premission_level) {
                             hasHigherPermission = true;
                         }
-                    });
+
+                        interaction.member.roles.cache.forEach(async (role) => {
+                            if (guildConfig.permissionLevels[role.id] >= command.premission_level) {
+                                hasHigherPermission = true;
+                            }
+                        });
+                    }
 
                     if (interaction.guild.ownerId === interaction.user.id) {
                         hasHigherPermission = true;
@@ -136,15 +139,17 @@ export class CommandManager {
             if (command.premission_level) {
                 let hasHigherPermission = false;
 
-                if (guildConfig.permissionLevels[message.author.id] >= command.premission_level) {
-                    hasHigherPermission = true;
-                }
-
-                message.member.roles.cache.forEach(async (role) => {
-                    if (guildConfig.permissionLevels[role.id] >= command.premission_level) {
+                if (guildConfig.permissionLevels) {
+                    if (guildConfig.permissionLevels[message.author.id] >= command.premission_level) {
                         hasHigherPermission = true;
                     }
-                });
+
+                    message.member.roles.cache.forEach(async (role) => {
+                        if (guildConfig.permissionLevels[role.id] >= command.premission_level) {
+                            hasHigherPermission = true;
+                        }
+                    });
+                }
 
                 if (message.guild.ownerId === message.author.id) {
                     hasHigherPermission = true;

@@ -187,7 +187,7 @@ export const Config: SlashCommand = {
                 } else
                 
                 if (role) {
-                    guildConfig.permissionLevels[role.id] = level;
+                    guildConfig.levelReward[level] = role.id;
                     await client.DatabaseManager.saveGuildConfig(guildConfig);
                     interaction.reply({ content: `The level reward for level **${level}** has been set to **<@&${role.id}>**`, ephemeral: true });
                 } 
