@@ -79,6 +79,7 @@ export class KiwiClient extends Client {
 
         // Database Manager
         this.DatabaseManager = new DatabaseManager(this);
+        this.CommandManager.unregister();
 
         this.on(Events.Ready, async () => {
             console.log(`${this.user?.username} is Online`);
