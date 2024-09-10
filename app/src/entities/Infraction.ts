@@ -1,7 +1,7 @@
 import { Entity, ObjectIdColumn, ObjectId, Column, BeforeInsert, BeforeUpdate } from 'typeorm';
 
 @Entity("infractions")
-export class InfractionsEntity {
+export class InfractionEntity {
     @ObjectIdColumn()
     id: ObjectId;
 
@@ -10,6 +10,9 @@ export class InfractionsEntity {
 
     @Column("user_id")
     userId: string;
+
+    @Column("infraction_id")
+    infractionId: number;
 
     @Column("user_name")
     userName: string;
