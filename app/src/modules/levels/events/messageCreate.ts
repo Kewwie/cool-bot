@@ -8,17 +8,15 @@ import { Event, EventList } from '@/types/event';
 export const MessageCreate: Event = {
 	name: EventList.MessageCreate,
 
-	async getGuildId(message: Message) {
-		return message.guildId;
-	},
-
 	/**
 	 * @param {KiwiClient} client
 	 * @param {Guild} guild
 	 */
 	async execute(client: KiwiClient, message: Message) {
+		console.log('messageCreate');
 		let guildConfig = await client.db.getGuildConfig(message.guild.id);
 		let xpGain = [95, 100, 105][Math.floor(Math.random() * 3)];
+		console.log(xpGain);
 
 		let userLevel = await client.db.getUserLevel(
 			message.guild.id,
@@ -31,6 +29,7 @@ export const MessageCreate: Event = {
 				message.author.username
 			);
 		}
+		console.log(userLevel);
 
 		if (new Date() < new Date(userLevel.lastUpdated.getTime() + 60000))
 			return;

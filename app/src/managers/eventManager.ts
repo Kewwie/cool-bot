@@ -49,18 +49,7 @@ export class EventManager {
 			if (!events) return;
 			events.forEach(async (event) => {
 				console.log(`Event: ${event.name}`);
-				if (event.module?.default) {
-					event.execute(this.client, ...args);
-				} else if (event.global) {
-					event.execute(this.client, ...args);
-				} else {
-					var guildId = await event.getGuildId(...args);
-					var isEnabled = await this.client.db.isModuleEnabled(
-						guildId,
-						event.module.id
-					);
-					if (isEnabled) event.execute(this.client, ...args);
-				}
+				event.execute(this.client, ...args);
 			});
 		});
 	}
