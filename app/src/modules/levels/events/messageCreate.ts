@@ -8,7 +8,7 @@ import { Event, EventList } from '@/types/event';
 export const MessageCreate: Event = {
 	name: EventList.MessageCreate,
 
-	async getGuildId(client: KiwiClient, message: Message) {
+	async getGuildId(message: Message) {
 		return message.guildId;
 	},
 
