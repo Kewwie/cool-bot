@@ -1,26 +1,26 @@
-import { KiwiClient } from "../client";
+import { KiwiClient } from '@/client';
+import { Module } from './module';
 
-export enum Events {
-    GuildBanAdd = "guildBanAdd",
-    GuildMemberAdd = "guildMemberAdd",
-    GuildMemberUpdate = "guildMemberUpdate",
-    GuildMemberRemove = "guildMemberRemove",
-    InteractionCreate = "interactionCreate",
-    Ready = "ready",
-    GuildReady = "guildReady",
-    VoiceStateUpdate = "voiceStateUpdate",
-    GuildAdminAdd = "guildAdminAdd",
-    GuildAdminRemove = "guildAdminRemove",
-    GuildVerifiedAdd = "guildVerifiedAdd",
-    GuildVerifiedRemove = "guildVerifiedRemove",
-    MessageCreate = "messageCreate",
-    GuildCreate = "guildCreate",
-    ChannelUpdate = "channelUpdate",
-    GuildUpdate = "guildUpdate",
+export enum EventList {
+	GuildBanAdd = 'guildBanAdd',
+	GuildMemberAdd = 'guildMemberAdd',
+	GuildMemberUpdate = 'guildMemberUpdate',
+	GuildMemberRemove = 'guildMemberRemove',
+	InteractionCreate = 'interactionCreate',
+	Ready = 'ready',
+	GuildReady = 'guildReady',
+	VoiceStateUpdate = 'voiceStateUpdate',
+	MessageCreate = 'messageCreate',
+	GuildCreate = 'guildCreate',
+	ChannelUpdate = 'channelUpdate',
+	GuildUpdate = 'guildUpdate',
+	PresenceUpdate = 'presenceUpdate',
 }
 
 export interface Event {
-    name: string;
-    getGuildId?: (...args: any) => Promise<string>;
-    execute: (client: KiwiClient, ...args: any) => void;
+	module?: Module;
+	name: string;
+	global?: boolean;
+	getGuildId?: (...args: any) => Promise<string>;
+	execute: (client: KiwiClient, ...args: any) => void;
 }

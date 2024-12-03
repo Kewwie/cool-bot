@@ -1,128 +1,133 @@
 import {
-    Client,
-    GatewayIntentBits,
-    Partials,
-    Collection,
-    ColorResolvable,
-    Message
-} from "discord.js";
+	Client,
+	GatewayIntentBits,
+	Partials,
+	Collection,
+	ColorResolvable,
+	ClientPresenceStatus,
+	Message,
+} from 'discord.js';
 
-import { ClientEvents } from "./events";
-import { ClientPrefixCommands } from "./prefixCommands";
-import { ClientSlashCommands } from "./slashCommands";
+import { DatabaseManager } from './managers/databaseManager';
 
-import { CommandManager } from "./commandManager";
-import { EventManager } from "./eventManager";
-import { DatabaseManager } from "./databaseManager";
-
-import { SlashCommand, PrefixCommand } from "./types/command";
-import { Event, Events } from "./types/event";
+import { EventManager } from './managers/eventManager';
+import { ComponentManager } from './managers/componentManager';
+import { CommandManager } from './managers/commandManager';
+import { ScheduleManager } from './managers/scheduleManager';
+import { ModuleManager } from './managers/moduleManager';
+import { CustomOptions } from './types/component';
 
 export class KiwiClient extends Client {
-    public embed: { 
-        color: {
-            fail: ColorResolvable | null;
-            success: ColorResolvable | null;
-            normal: ColorResolvable | null;
-        };
-    };
+	public Settings: {
+		color: ColorResolvable;
+	};
+	public db: DatabaseManager;
 
-    public SlashCommands: Collection<string, SlashCommand>;
-    public PrefixCommands: Collection<string, PrefixCommand>;
-    public Events: Collection<string, Event>;
+	public EventManager: EventManager;
+	public ComponentManager: ComponentManager;
+	public CommandManager: CommandManager;
+	public ScheduleManager: ScheduleManager;
+	public ModuleManager: ModuleManager;
 
-    public CommandManager: CommandManager;
-    public EventManager: EventManager;
-    public DatabaseManager: DatabaseManager;
+	constructor() {
+		super({
+			intents: [
+				GatewayIntentBits.Guilds,
+				GatewayIntentBits.GuildMembers,
+				GatewayIntentBits.GuildMessages,
+				GatewayIntentBits.GuildModeration,
+				GatewayIntentBits.GuildVoiceStates,
+				GatewayIntentBits.GuildPresences,
+				GatewayIntentBits.MessageContent,
+				//GatewayIntentBits.AutoModerationExecution,
+				//GatewayIntentBits.AutoModerationConfiguration,
+			],
+			partials: [
+				Partials.GuildMember,
+				Partials.Channel,
+				Partials.Message,
+				Partials.User,
+			],
+			presence: {
+				status: 'online' as ClientPresenceStatus,
+			},
+		});
 
-    constructor() {
-        super({
-            intents: [
-                GatewayIntentBits.Guilds,
-                GatewayIntentBits.GuildMembers,
-                GatewayIntentBits.GuildMessages,
-                GatewayIntentBits.GuildModeration,
-                GatewayIntentBits.MessageContent,
-                //GatewayIntentBits.GuildVoiceStates,
-                //GatewayIntentBits.AutoModerationExecution,
-                //GatewayIntentBits.AutoModerationConfiguration,
-            ],
-            partials: [
-                Partials.GuildMember,
-                Partials.Channel,
-                Partials.Message,
-                Partials.User,
-            ],
-        });
+		this.Settings = {
+			color: '#7289DA',
+		};
 
-        this.Events = new Collection();
-        this.SlashCommands = new Collection();
-        this.PrefixCommands = new Collection();
+		// Database Manager
+		this.db = new DatabaseManager(this);
 
-        // Event Manager
-        this.EventManager = new EventManager(this);
-        for (let event of ClientEvents) {
-            this.EventManager.load(event);
-        }
-        this.EventManager.register([...this.Events.values()]);
+		// Event Manager
+		this.EventManager = new EventManager(this);
 
-        // Command Manager
-        this.CommandManager = new CommandManager(this);
-        for (let command of ClientPrefixCommands) {
-            this.CommandManager.loadPrefix(command);
-        }
-        for (let command of ClientSlashCommands) {
-            this.CommandManager.loadSlash(command);
-        }
-        this.on(Events.InteractionCreate, this.CommandManager.onInteraction.bind(this.CommandManager));
-        this.on(Events.MessageCreate, this.CommandManager.onMessage.bind(this.CommandManager));
+		// Component Manager
+		this.ComponentManager = new ComponentManager(this);
 
-        // Database Manager
-        this.DatabaseManager = new DatabaseManager(this);
-        this.CommandManager.unregister();
+		// Command Manager
+		this.CommandManager = new CommandManager(this);
 
-        this.on(Events.Ready, async () => {
-            console.log(`${this.user?.username} is Online`);
-            for (let guild of await this.guilds.fetch()) {
-                this.CommandManager.register([...this.SlashCommands.values()], guild[0]);
-                this.emit(Events.GuildReady, await guild[1].fetch());
-            }
-        });
+		// Schedule Manager
+		this.ScheduleManager = new ScheduleManager(this);
 
-        this.on(Events.GuildCreate, async (guild) => {
-            console.log(`Joined ${guild.name}`);
-            this.CommandManager.register([...this.SlashCommands.values()], guild.id);
-        });
-    }
+		this.ModuleManager = new ModuleManager(this);
+	}
 
-    public async calculateXp(level: number) {
+	public capitalize(str: string): string {
+		return str.charAt(0).toUpperCase() + str.slice(1);
+	}
+
+	public addSpace(value: string) {
+		return value.replace(/([A-Z])/g, ' $1').trim();
+	}
+
+	public createCustomId(options: CustomOptions): string {
+		var customId = new Array<string>();
+		for (var [key, value] of Object.entries(options)) {
+			if (customId.includes('&')) continue;
+			customId.push(`${key}=${value}`);
+		}
+		return customId.join('&');
+	}
+
+	public getBoolean(value: string) {
+		if (value.toLowerCase() === 'true') {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	public async getId(message: Message, value: string): Promise<string> {
+		if (value.startsWith('<@') && value.endsWith('>')) {
+			value = value.slice(2, -1);
+			if (value.startsWith('!')) {
+				value = value.slice(1);
+			}
+		} else if (value.startsWith('<#') && value.endsWith('>')) {
+			value = value.slice(2, -1);
+		} else if (value.startsWith('<@&') && value.endsWith('>')) {
+			value = value.slice(3, -1);
+		} else if (value.includes('u') && message.reference) {
+			var messageReference = await message.fetchReference();
+			value = messageReference.author.id;
+		} else if (!/^\d{17,19}$/.test(value)) {
+			value = null;
+		}
+		return value;
+	}
+
+	public createMessageUrl(
+		guildId: string,
+		channelId: string,
+		messageId: string
+	): string {
+		return `https://discord.com/channels/${guildId}/${channelId}/${messageId}`;
+	}
+
+	public calculateXp(level: number) {
         return 100 * Math.pow(level, 2) + 50 * level;
     }
-
-    public capitalize(string: string) {
-        return string.charAt(0).toUpperCase() + string.slice(1);
-    }
-
-    public async getUserFromArg(arg: string) {
-        if (!arg) return null;
-        var user;
-
-        if (arg.includes("@") || arg.match(/^[0-9]+$/)) {
-            user = await this.users.fetch(
-                arg
-                    .replace("<@", "")
-                    .replace("!", "")
-                    .replace(">", "")
-            );
-        } else {
-            user = await this.users.cache.find(u => u.username.toLowerCase() === arg.toLowerCase());
-        }
-        return user;
-    }
-
-    public async getRepliedUser(message: Message) {
-        if (!message.reference) return null;
-        let repliedMessage = await message.channel.messages.fetch(message.reference.messageId);
-        return await this.users.fetch(repliedMessage.author.id);
-    }
-};
+}

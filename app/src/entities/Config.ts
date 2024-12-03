@@ -1,34 +1,40 @@
 import { Entity, ObjectIdColumn, ObjectId, Column } from 'typeorm';
 
-@Entity("config")
+@Entity('config')
 export class ConfigEntity {
-    @ObjectIdColumn()
-    id: ObjectId;
+	@ObjectIdColumn()
+	id: ObjectId;
 
-    @Column("guild_id")
-    guildId: string;
+	@Column('guild_id')
+	guildId: string;
 
-    @Column("trusted_role")
-    trustedRole: string = null;
+	@Column('prefix')
+	prefix: string = '!';
 
-    @Column("permission_levels")
-    permissionLevels: {
-        [key: string]: number;
-    } = {};
+	@Column('trusted_role')
+	trustedRole: string = null;
 
-    @Column("command_levels")
-    commandLevels: {
-        [key: string]: number;
-    } = {};
+	@Column('roles')
+	roles: {
+		[id: string]: {
+			[command: string]: boolean;
+		};
+	} = {};
 
-    @Column("level_reward")
-    levelReward: {
-        [key: number]: string;
-    } = {};
+	@Column('level_reward')
+	levelReward: {
+		[level: number]: string;
+	} = {};
 
-    @Column("level_up_message")
-    levelUpMessage: string = "**Congrats {userMention} you have leveled up to level {level}!**";
+	@Column('level_up_message')
+	levelUpMessage: string =
+		'**Congrats {userMention} you have leveled up to level {level}!**';
 
-    @Column("level_up_channel")
-    levelUpChannel: string = null;
+	@Column('level_up_channel')
+	levelUpChannel: string = null;
+
+	@Column('modules')
+	modules: {
+		[moduleId: string]: boolean;
+	} = {};
 }
