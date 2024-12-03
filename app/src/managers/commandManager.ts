@@ -193,7 +193,7 @@ export class CommandManager {
 		var count = 0;
 		var args = new Array();
 		for (let option of command.config.options) {
-			if (!textArgs[count]) {
+			if (!textArgs[count] && !option.selfDefault) {
 				channel.send({
 					content: `You must provide a ${option.name}`,
 				});
@@ -211,12 +211,17 @@ export class CommandManager {
 				}
 				args.push(number);
 			} else {
-				var id = await this.client.getId(message, textArgs[count]);
-				if (!id) {
-					channel.send({
-						content: `You must provide a valid ${option.name}`,
-					});
-					return;
+				var id;
+				if (!textArgs[count] && option.selfDefault) {
+					id = message.author.id;
+				} else {
+					id = await this.client.getId(message, textArgs[count]);
+					if (!id) {
+						channel.send({
+							content: `You must provide a valid ${option.name}`,
+						});
+						return;
+					}
 				}
 
 				var entry;
@@ -255,7 +260,7 @@ export class CommandManager {
 					return;
 				}
 			}*/
-			if (message.guildId && command.module) {
+			if (message.guildId && command.module && command.checks) {
 				var passedChecks = await command.checks(
 					this.client,
 					message,

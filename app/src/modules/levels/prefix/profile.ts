@@ -18,6 +18,7 @@ export const ProfilePrefix: PrefixCommand = {
 			{
 				name: 'user',
 				type: ConfigOptionTypes.USER,
+				selfDefault: true,
 			},
 		],
 	},
