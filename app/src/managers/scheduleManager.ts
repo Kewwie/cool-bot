@@ -13,11 +13,10 @@ export class ScheduleManager {
 		scheduleJob(schedule.rule, async () => {
 			for (var guild of await this.client.guilds.fetch()) {
 				if (guild[0] && schedule.module && !schedule.module?.default) {
-					let isEnabled =
-						await this.client.db.repos.guildModules.findOneBy({
-							guildId: guild[0],
-							moduleId: schedule.module.id,
-						});
+					let isEnabled = await this.client.db.isModuleEnabled(
+						guild[1].id,
+						schedule.module.id
+					);
 					if (isEnabled) {
 						schedule.execute(this.client, guild[0]);
 					}
