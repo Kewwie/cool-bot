@@ -23,6 +23,7 @@ export interface PrefixCommand {
 		options?: {
 			name: string;
 			type: ConfigOptionTypes;
+			options?: string[];
 			maxValue?: number;
 			includeAfter?: boolean;
 			selfDefault?: boolean;
@@ -49,6 +50,7 @@ export enum ConfigOptionTypes {
 	ROLE = 4,
 	TEXT = 5,
 	NUMBER = 6,
+	OPTIONS = 7,
 }
 
 export interface CommandOptions {
@@ -73,12 +75,12 @@ export interface SlashCommand {
 	level?: number;
 	config: SlashCommandBuilder | any;
 	autocomplete?: (
-		interaction: AutocompleteInteraction,
-		client: KiwiClient
+		client: KiwiClient,
+		interaction: AutocompleteInteraction
 	) => Promise<void>;
 	execute: (
-		interaction: ChatInputCommandInteraction,
-		client: KiwiClient
+		client: KiwiClient,
+		interaction: ChatInputCommandInteraction
 	) => Promise<void>;
 }
 

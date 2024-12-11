@@ -37,8 +37,9 @@ export class DatabaseManager {
 		config.prefix = '!';
 		config.trustedRole = null;
 		config.roles = {};
-		config.levelReward = {};
-		config.levelUpMessage = '**Congrats {userMention} you have leveled up to level {level}!**';
+		config.levelRewards = {};
+		config.levelUpMessage =
+			'**Congrats {userMention} you have leveled up to level {level}!**';
 		config.levelUpChannel = null;
 		config.modules = {};
 		return await this.repos.config.save(config);
@@ -53,59 +54,87 @@ export class DatabaseManager {
 	}
 
 	public async isModuleEnabled(guildId: string, moduleId: string) {
-		let config = await this.repos.config.findOne({ where: { guildId: guildId } });
+		let config = await this.repos.config.findOne({
+			where: { guildId: guildId },
+		});
 		if (config?.modules[moduleId]) {
 			return true;
 		}
 		return false;
 	}
 
-	public async createUserLevel(guildId: string, userId: string, userName: string) {
-        let userLevel = new UserLevelEntity();
-        userLevel.guildId = guildId;
-        userLevel.userId = userId;
-        userLevel.userName = userName;
-        return await this.repos.levels.save(userLevel);
-    }
+	public async createUserLevel(
+		guildId: string,
+		userId: string,
+		userName: string
+	) {
+		let userLevel = new UserLevelEntity();
+		userLevel.guildId = guildId;
+		userLevel.userId = userId;
+		userLevel.userName = userName;
+		return await this.repos.levels.save(userLevel);
+	}
 
-    public async getUserLevel(guildId: string, userId: string) {
-        return await this.repos.levels.findOne({ where: { guildId: guildId, userId: userId } });
-    }
+	public async getUserLevel(guildId: string, userId: string) {
+		return await this.repos.levels.findOne({
+			where: { guildId: guildId, userId: userId },
+		});
+	}
 
-    public async saveUserLevel(userLevel: UserLevelEntity) {
-        return await this.repos.levels.save(userLevel);
-    }
+	public async saveUserLevel(userLevel: UserLevelEntity) {
+		return await this.repos.levels.save(userLevel);
+	}
 
-    public async createInfraction(guildId: string, userId: string, userName: string, reason: string) {
-        var infractions = await this.getInfractions(guildId, userId);
-        let highestInfractionId = 0;
-        infractions.forEach((infraction) => {
-            if (infraction.infractionId > highestInfractionId) {
-                highestInfractionId = infraction.infractionId;
-            }
-        });
-        let infraction = new InfractionEntity();
-        infraction.guildId = guildId;
-        infraction.userId = userId;
-        infraction.infractionId = highestInfractionId + 1;
-        infraction.userName = userName;
-        infraction.reason = reason;
-        return await this.repos.infractions.save(infraction);
-    }
+	public async createInfraction(
+		guildId: string,
+		userId: string,
+		userName: string,
+		reason: string
+	) {
+		var infractions = await this.getInfractions(guildId, userId);
+		let highestInfractionId = 0;
+		infractions.forEach((infraction) => {
+			if (infraction.infractionId > highestInfractionId) {
+				highestInfractionId = infraction.infractionId;
+			}
+		});
+		let infraction = new InfractionEntity();
+		infraction.guildId = guildId;
+		infraction.userId = userId;
+		infraction.infractionId = highestInfractionId + 1;
+		infraction.userName = userName;
+		infraction.reason = reason;
+		return await this.repos.infractions.save(infraction);
+	}
 
-    public async getInfractions(guildId: string, userId: string) {
-        return await this.repos.infractions.find({ where: { guildId: guildId, userId: userId } });
-    }
+	public async getInfractions(guildId: string, userId: string) {
+		return await this.repos.infractions.find({
+			where: { guildId: guildId, userId: userId },
+		});
+	}
 
-    public async getInfraction(guildId: string, userId: string, infractionId: number) {
-        return await this.repos.infractions.findOne({ where: { guildId: guildId, userId: userId, infractionId: infractionId } });
-    }
+	public async getInfraction(
+		guildId: string,
+		userId: string,
+		infractionId: number
+	) {
+		return await this.repos.infractions.findOne({
+			where: {
+				guildId: guildId,
+				userId: userId,
+				infractionId: infractionId,
+			},
+		});
+	}
 
-    public async saveInfraction(infraction: InfractionEntity) {
-        return await this.repos.infractions.save(infraction);
-    }
+	public async saveInfraction(infraction: InfractionEntity) {
+		return await this.repos.infractions.save(infraction);
+	}
 
-    public async deleteInfraction(userId: string, infractionId: number) {
-        return await this.repos.infractions.delete({ userId: userId, infractionId: infractionId });
-    }
+	public async deleteInfraction(userId: string, infractionId: number) {
+		return await this.repos.infractions.delete({
+			userId: userId,
+			infractionId: infractionId,
+		});
+	}
 }

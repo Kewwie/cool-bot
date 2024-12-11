@@ -101,7 +101,7 @@ export class CommandManager {
 			}
 
 			try {
-				await command.execute(interaction, this.client);
+				await command.execute(this.client, interaction);
 			} catch (error) {
 				console.error(error);
 				await interaction.reply({
@@ -115,7 +115,7 @@ export class CommandManager {
 			if (!command) return;
 
 			try {
-				await command.autocomplete(interaction, this.client);
+				await command.autocomplete(this.client, interaction);
 			} catch (error) {
 				console.error(error);
 				await interaction.reply({

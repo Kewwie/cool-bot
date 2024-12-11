@@ -22,7 +22,7 @@ export class ConfigEntity {
 	} = {};
 
 	@Column('level_reward')
-	levelReward: {
+	levelRewards: {
 		[level: number]: string;
 	} = {};
 
