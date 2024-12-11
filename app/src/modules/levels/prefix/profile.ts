@@ -44,8 +44,8 @@ export const ProfilePrefix: PrefixCommand = {
 		profileDescription += `${client.generateProgressBar(
 			levelXp,
 			neededXp,
-			10
-		)}`;
+			8
+		)}`; // Change the number to change the length of the progress bar (Do on emoji update)
 
 		var profileEmbed = new EmbedBuilder()
 			.setColor('#2b2d31')
