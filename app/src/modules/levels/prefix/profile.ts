@@ -38,7 +38,6 @@ export const ProfilePrefix: PrefixCommand = {
 			(await client.calculateXp(userLevel.level));
 
 		var profileDescription = '';
-		profileDescription += `**Rank:** Soon\n`;
 		profileDescription += `**Level:** ${userLevel.level}\n`;
 		profileDescription += `**Progress:** ${levelXp} / ${neededXp}\n`;
 
