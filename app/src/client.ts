@@ -17,6 +17,8 @@ import { ScheduleManager } from './managers/scheduleManager';
 import { ModuleManager } from './managers/moduleManager';
 import { CustomOptions } from './types/component';
 
+import { Emojis } from './emojis';
+
 export class KiwiClient extends Client {
 	public Settings: {
 		color: ColorResolvable;
@@ -90,6 +92,28 @@ export class KiwiClient extends Client {
 
 	public addSpace(value: string) {
 		return value.replace(/([A-Z])/g, ' $1').trim();
+	}
+
+	public generateProgressBar(
+		progress: number,
+		total: number,
+		length: number
+	) {
+		var filledBlocks = Math.floor((progress / total) * length);
+		var emptyBlocks = length - filledBlocks;
+		var progressBar = '';
+
+		progressBar +=
+			filledBlocks > 0
+				? Emojis.progressBar.filledStart
+				: Emojis.progressBar.emptyStart;
+		progressBar += Emojis.progressBar.filledMiddle.repeat(filledBlocks - 1);
+		progressBar += Emojis.progressBar.emptyMiddle.repeat(emptyBlocks - 1);
+		progressBar +=
+			filledBlocks === length
+				? Emojis.progressBar.filledEnd
+				: Emojis.progressBar.emptyEnd;
+		return progressBar;
 	}
 
 	public createCustomId(options: CustomOptions): string {

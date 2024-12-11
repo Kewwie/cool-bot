@@ -41,6 +41,11 @@ export const ProfilePrefix: PrefixCommand = {
 		profileDescription += `**Progress:** ${client.formatNumber(
 			levelXp
 		)} / ${client.formatNumber(neededXp)}\n`;
+		profileDescription += `${client.generateProgressBar(
+			levelXp,
+			neededXp,
+			10
+		)}`;
 
 		var profileEmbed = new EmbedBuilder()
 			.setColor('#2b2d31')
