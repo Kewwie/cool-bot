@@ -32,17 +32,37 @@ export class DatabaseManager {
 	}
 
 	public async generateConfigs(guildId: string) {
-		let config = new ConfigEntity();
-		config.guildId = guildId;
-		config.prefix = '!';
-		config.trustedRole = null;
-		config.roles = {};
-		config.levelRewards = {};
-		config.levelUpMessage =
-			'**Congrats {userMention} you have leveled up to level {level}!**';
-		config.levelUpChannel = null;
-		config.modules = {};
-		return await this.repos.config.save(config);
+		var config = await this.getGuildConfig(guildId);
+		if (!config) {
+			config = new ConfigEntity();
+			config.guildId = guildId;
+		}
+		if (!config.prefix) {
+			config.prefix = '!';
+		}
+		if (!config.trustedRole) {
+			config.trustedRole = null;
+		}
+		if (!config.roles) {
+			config.roles = {};
+		}
+		if (!config.levelRewards) {
+			config.levelRewards = {};
+		}
+		if (!config.levelUpMessage) {
+			config.levelUpMessage =
+				'**Congrats {userMention} you have leveled up to level {level}!**';
+		}
+		if (!config.levelUpChannel) {
+			config.levelUpChannel = null;
+		}
+		for (var module of this.client.ModuleManager.Modules.keys()) {
+			if (!config.modules[module]) {
+				config.modules[module] = false;
+			}
+		}
+
+		return await this.saveGuildConfig(config);
 	}
 
 	public async getGuildConfig(guildId: string) {

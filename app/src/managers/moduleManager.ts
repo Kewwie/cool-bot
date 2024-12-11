@@ -73,7 +73,7 @@ export class ModuleManager {
 	}
 
 	public async checkGuild(guild: Guild, user: User, module: Module) {
-		if (module.developerOnly && env.STAFF_USERS.includes(user.id)) {
+		if (env.STAFF.includes(user.id)) {
 			return {
 				status: true,
 			};
@@ -85,10 +85,10 @@ export class ModuleManager {
 		}
 
 		if (!module?.default) {
-			var isEnabled = await this.client.db.repos.guildModules.findOneBy({
-				guildId: guild.id,
-				moduleId: module.id,
-			});
+			var isEnabled = await this.client.db.isModuleEnabled(
+				guild.id,
+				module.id
+			);
 			if (!isEnabled) {
 				return {
 					response: `This module is disabled!`,
