@@ -1,30 +1,40 @@
-import { Entity, ObjectIdColumn, ObjectId, Column, BeforeInsert, BeforeUpdate } from 'typeorm';
+import {
+	Entity,
+	ObjectIdColumn,
+	ObjectId,
+	Column,
+	BeforeInsert,
+	BeforeUpdate,
+} from 'typeorm';
 
-@Entity("infractions")
+@Entity('infractions')
 export class InfractionEntity {
-    @ObjectIdColumn()
-    id: ObjectId;
+	@ObjectIdColumn()
+	id: ObjectId;
 
-    @Column("guild_id")
-    guildId: string;
+	@Column('guild_id')
+	guildId: string;
 
-    @Column("user_id")
-    userId: string;
+	@Column('user_id')
+	userId: string;
 
-    @Column("infraction_id")
-    infractionId: number;
+	@Column('infraction_id')
+	infractionId: number;
 
-    @Column("user_name")
-    userName: string;
+	@Column('user_name')
+	userName: string;
 
-    @Column("level")
-    reason: string;
+	@Column('level')
+	reason: string;
 
-    @Column("created_at")
-    createdAt: Date;
+	@Column('expires_at')
+	expiresAt: Date;
 
-    @BeforeInsert()
-    AddCreatedAt() {
-        this.createdAt = new Date();
-    }
+	@Column('created_at')
+	createdAt: Date;
+
+	@BeforeInsert()
+	AddCreatedAt() {
+		this.createdAt = new Date();
+	}
 }
