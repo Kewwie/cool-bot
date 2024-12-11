@@ -36,15 +36,20 @@ export const GuildModuleCommand: SlashCommand = {
 		switch (interaction.options.getSubcommand(true)) {
 			case 'toggle': {
 				var module = interaction.options.getString('module');
+				var response = '';
 				if (!cfg.modules[module]) {
 					cfg.modules[module] = true;
+					response = `**${client.capitalize(module)}:** Enabled`;
 				} else {
 					cfg.modules[module] = false;
+					response = `**${client.capitalize(module)}:** Disabled`;
 				}
+				await client.db.saveGuildConfig(cfg);
+				interaction.reply({ content: response });
 				break;
 			}
 
-			case 'list': {
+			case 'view': {
 				var enabledModules = Object.keys(cfg.modules).filter(
 					(module) => cfg.modules[module] === true
 				);
@@ -54,8 +59,8 @@ export const GuildModuleCommand: SlashCommand = {
 
 				interaction.reply({
 					content: [
-						`**Enabled Modules** ${enabledModules.join('\n')}`,
-						`**Disabled Modules** ${disabledModules.join('\n')}`,
+						`**Enabled Modules**\n${enabledModules.join('\n')}`,
+						`**Disabled Modules**\n${disabledModules.join('\n')}`,
 					].join('\n\n'),
 				});
 				break;
