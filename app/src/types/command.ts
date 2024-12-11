@@ -26,7 +26,7 @@ export interface PrefixCommand {
 			options?: string[];
 			maxValue?: number;
 			includeAfter?: boolean;
-			selfDefault?: boolean;
+			defaultSelf?: boolean;
 		}[];
 	};
 	checks?: (

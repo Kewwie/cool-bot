@@ -240,7 +240,7 @@ export class CommandManager {
 					args.push(textArgs[count]);
 				} else {
 					var id = await this.client.getId(message, textArgs[count]);
-					if (!id && !option.selfDefault) {
+					if (!id && !option.defaultSelf) {
 						channel.send({
 							content: `You must provide a valid ${option.name}`,
 						});
@@ -249,19 +249,19 @@ export class CommandManager {
 
 					var entry;
 					if (option.type === ConfigOptionTypes.USER) {
-						if (!id && option.selfDefault) {
+						if (!id && option.defaultSelf) {
 							id = message.author.id;
 						}
 						entry = await this.client.users.fetch(id);
 						args.push(entry);
 					} else if (option.type === ConfigOptionTypes.MEMBER) {
-						if (!id && option.selfDefault) {
+						if (!id && option.defaultSelf) {
 							id = message.author.id;
 						}
 						entry = await message.guild?.members.fetch(id);
 						args.push(entry);
 					} else if (option.type === ConfigOptionTypes.CHANNEL) {
-						if (!id && option.selfDefault) {
+						if (!id && option.defaultSelf) {
 							id = message.channel.id;
 						}
 						entry = await message.guild?.channels.fetch(id);
