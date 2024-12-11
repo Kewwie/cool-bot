@@ -98,6 +98,10 @@ export const LevelRewardCommand: SlashCommand = {
 				}
 				delete cfg.levelRewards[level];
 				await client.db.saveGuildConfig(cfg);
+				interaction.reply({
+					content: `**Level Reward:** <@&${roleId}> removed`,
+					allowedMentions: { parse: [] },
+				});
 				break;
 			}
 
@@ -106,6 +110,13 @@ export const LevelRewardCommand: SlashCommand = {
 					([level, reward]) =>
 						`**Level:** ${level}\n**Role:** <@&${reward.roleId}>`
 				);
+				if (!rewards.length) {
+					interaction.reply({
+						content: 'No level rewards',
+						allowedMentions: { parse: [] },
+					});
+					return;
+				}
 				interaction.reply({
 					content: rewards.join('\n\n'),
 					allowedMentions: { parse: [] },
