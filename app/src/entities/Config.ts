@@ -23,8 +23,8 @@ export class ConfigEntity {
 
 	@Column('level_reward')
 	levelRewards: {
-		[level: number]: {
-			roleId: string;
+		[roleId: string]: {
+			level: number;
 			permanent: boolean;
 		};
 	} = {};
