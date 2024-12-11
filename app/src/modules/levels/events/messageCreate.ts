@@ -5,6 +5,10 @@ import { Event, EventList } from '@/types/event';
 export const MessageCreate: Event = {
 	name: EventList.MessageCreate,
 
+	async getGuildId(message: Message) {
+		return message.guild.id;
+	},
+
 	async execute(client: KiwiClient, message: Message) {
 		let guildConfig = await client.db.getGuildConfig(message.guild.id);
 		let xpGain = [95, 100, 105][Math.floor(Math.random() * 3)];
