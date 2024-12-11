@@ -36,10 +36,11 @@ export const ProfilePrefix: PrefixCommand = {
 		var neededXp =
 			(await client.calculateXp(userLevel.level + 1)) -
 			(await client.calculateXp(userLevel.level));
-
 		var profileDescription = '';
 		profileDescription += `**Level:** ${userLevel.level}\n`;
-		profileDescription += `**Progress:** ${levelXp} / ${neededXp}\n`;
+		profileDescription += `**Progress:** ${client.formatNumber(
+			levelXp
+		)} / ${client.formatNumber(neededXp)}\n`;
 
 		var profileEmbed = new EmbedBuilder()
 			.setColor('#2b2d31')

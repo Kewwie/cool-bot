@@ -31,6 +31,8 @@ export class KiwiClient extends Client {
 
 	private _logChannel: TextChannel;
 
+	public formatNumber: (value: number) => string;
+
 	constructor() {
 		super({
 			intents: [
@@ -75,6 +77,11 @@ export class KiwiClient extends Client {
 		this.ScheduleManager = new ScheduleManager(this);
 
 		this.ModuleManager = new ModuleManager(this);
+
+		this.formatNumber = new Intl.NumberFormat('en-US', {
+			minimumFractionDigits: 0,
+			maximumFractionDigits: 0,
+		}).format;
 	}
 
 	public capitalize(str: string): string {
