@@ -35,6 +35,7 @@ export class DatabaseManager {
 		var config = await this.getGuildConfig(guildId);
 		console.log(config, 1011);
 		if (!config) {
+			console.log('Creating new config', 1013);
 			config = new ConfigEntity();
 			config.guildId = guildId;
 		}
@@ -62,6 +63,7 @@ export class DatabaseManager {
 				config.modules[module] = false;
 			}
 		}
+		console.log(config, 1040);
 
 		return await this.saveGuildConfig(config);
 	}

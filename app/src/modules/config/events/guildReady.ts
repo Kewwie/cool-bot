@@ -6,6 +6,6 @@ export const GuildReady: Event = {
 	name: EventList.GuildReady,
 
 	async execute(client: KiwiClient, guild: Guild) {
-		await client.db.generateConfigs(guild.id);
+		console.log(await client.db.generateConfigs(guild.id));
 	},
 };
