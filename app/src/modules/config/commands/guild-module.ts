@@ -11,6 +11,7 @@ import {
 export const GuildModuleCommand: SlashCommand = {
 	config: new SlashCommandBuilder()
 		.setName('guild-module')
+		.setDescription('Manage the guilds modules')
 		.addSubcommand((subcommand) =>
 			subcommand
 				.setName('toggle')
