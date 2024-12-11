@@ -106,10 +106,7 @@ export const LevelRewardCommand: SlashCommand = {
 			}
 
 			case 'view': {
-				let rewards = cfg.levelRewards.map(
-					(reward) =>
-						`**Level:** ${reward.level}\n**Role:** <@&${reward.roleId}>\n**Permanent:** ${reward.permanent}`
-				);
+				let rewards = cfg.levelRewards;
 				if (!rewards.length) {
 					interaction.reply({
 						content: 'No level rewards',
@@ -118,7 +115,15 @@ export const LevelRewardCommand: SlashCommand = {
 					return;
 				}
 				interaction.reply({
-					content: rewards.join('\n\n'),
+					content: rewards
+						.map((reward) =>
+							[
+								`**Level:** ${reward.level}`,
+								`**Role:** <@&${reward.roleId}>`,
+								`**Permanent:** ${reward.permanent}`,
+							].join('\n')
+						)
+						.join('\n\n'),
 					allowedMentions: { parse: [] },
 				});
 				break;
