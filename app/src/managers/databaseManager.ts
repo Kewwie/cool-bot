@@ -47,7 +47,7 @@ export class DatabaseManager {
 			config.roles = {};
 		}
 		if (!config.levelRewards) {
-			config.levelRewards = {};
+			config.levelRewards = [];
 		}
 		if (!config.levelUpMessage) {
 			config.levelUpMessage =

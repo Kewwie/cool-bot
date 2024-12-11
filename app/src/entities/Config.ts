@@ -9,35 +9,33 @@ export class ConfigEntity {
 	guildId: string;
 
 	@Column('prefix')
-	prefix: string = '!';
+	prefix: string;
 
 	@Column('trusted_role')
-	trustedRole: string = null;
+	trustedRole: string;
 
 	@Column('roles')
 	roles: {
 		[id: string]: {
 			[command: string]: boolean;
 		};
-	} = {};
+	};
 
 	@Column('level_reward')
 	levelRewards: {
-		[roleId: string]: {
-			level: number;
-			permanent: boolean;
-		};
-	} = {};
+		roleId: string;
+		level: number;
+		permanent: boolean;
+	}[];
 
 	@Column('level_up_message')
-	levelUpMessage: string =
-		'**Congrats {userMention} you have leveled up to level {level}!**';
+	levelUpMessage: string;
 
 	@Column('level_up_channel')
-	levelUpChannel: string = null;
+	levelUpChannel: string;
 
 	@Column('modules')
 	modules: {
 		[moduleId: string]: boolean;
-	} = {};
+	};
 }

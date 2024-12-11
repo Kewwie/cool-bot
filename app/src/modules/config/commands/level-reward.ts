@@ -63,7 +63,7 @@ export const LevelRewardCommand: SlashCommand = {
 			case 'add': {
 				var roleId = interaction.options.getRole('role').id;
 				if (
-					Object.keys(cfg.levelRewards).find((rId) => rId === roleId)
+					cfg.levelRewards.find((reward) => reward.roleId === roleId)
 				) {
 					interaction.reply({
 						content: 'Role already has a level reward',
@@ -73,7 +73,7 @@ export const LevelRewardCommand: SlashCommand = {
 				var level = parseInt(interaction.options.getString('level'));
 				var permanent =
 					interaction.options.getBoolean('permanent') || false;
-				cfg.levelRewards[roleId] = { level, permanent };
+				cfg.levelRewards.push({ roleId, level, permanent });
 				await client.db.saveGuildConfig(cfg);
 				interaction.reply({
 					content: `**Level Reward:** <@&${roleId}> at level **${level}**`,
@@ -84,15 +84,19 @@ export const LevelRewardCommand: SlashCommand = {
 
 			case 'remove': {
 				var roleId = interaction.options.getRole('role').id;
-				let reward = cfg.levelRewards[roleId];
+				let reward = cfg.levelRewards.find(
+					(reward) => reward.roleId === roleId
+				);
 				if (!reward) {
 					interaction.reply({
-						content: `<@&${roleId}> has a level reward`,
+						content: `<@&${roleId}> already has a level reward`,
 						allowedMentions: { parse: [] },
 					});
 					return;
 				}
-				delete cfg.levelRewards[roleId];
+				cfg.levelRewards = cfg.levelRewards.filter(
+					(reward) => reward.roleId !== roleId
+				);
 				await client.db.saveGuildConfig(cfg);
 				interaction.reply({
 					content: `**Level Reward:** <@&${roleId}> removed`,
@@ -102,9 +106,9 @@ export const LevelRewardCommand: SlashCommand = {
 			}
 
 			case 'view': {
-				let rewards = Object.entries(cfg.levelRewards).map(
-					([roleId, reward]) =>
-						`**Level:** ${reward.level}\n**Role:** <@&${roleId}>\n**Permanent:** ${reward.permanent}`
+				let rewards = cfg.levelRewards.map(
+					(reward) =>
+						`**Level:** ${reward.level}\n**Role:** <@&${reward.roleId}>\n**Permanent:** ${reward.permanent}`
 				);
 				if (!rewards.length) {
 					interaction.reply({

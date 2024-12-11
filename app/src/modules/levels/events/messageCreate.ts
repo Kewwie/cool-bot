@@ -48,30 +48,25 @@ export const MessageCreate: Event = {
 			}
 
 			if (guildConfig?.levelRewards) {
-				let closestReward = Object.keys(guildConfig.levelRewards)
-					.map(Number)
-					.filter((level) => level <= userLevel.level)
-					.sort((a, b) => b - a)[0];
+				let closestReward = guildConfig.levelRewards
+					.filter((reward) => reward.level <= userLevel.level)
+					.sort((a, b) => b.level - a.level)[0];
 
 				if (closestReward) {
-					let newReward = guildConfig.levelRewards[closestReward];
-					let newRewardKey = closestReward.toString();
 					guildConfig.levelRewards;
-					for (var [key, value] of Object.entries(
-						guildConfig.levelRewards
-					)) {
-						if (newRewardKey === key) continue;
+					for (var reward of guildConfig.levelRewards) {
+						if (closestReward.roleId === reward.roleId) continue;
 						if (
-							message.member?.roles.cache.has(key) &&
-							!value.permanent
+							message.member?.roles.cache.has(reward.roleId) &&
+							!reward.permanent
 						) {
 							message.member?.roles
-								.remove(key)
+								.remove(reward.roleId)
 								.catch(console.error);
 						}
 					}
 					message.member?.roles
-						.add(newRewardKey)
+						.add(closestReward.roleId)
 						.catch(console.error);
 				}
 			}
