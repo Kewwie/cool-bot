@@ -17,13 +17,6 @@ export const MessageCreate: Event = {
 			message.guild.id,
 			message.author.id
 		);
-		if (!userLevel) {
-			userLevel = await client.db.createUserLevel(
-				message.guild.id,
-				message.author.id,
-				message.author.username
-			);
-		}
 
 		if (new Date() < new Date(userLevel.lastUpdated.getTime() + 60000))
 			return;

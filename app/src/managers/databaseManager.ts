@@ -84,7 +84,7 @@ export class DatabaseManager {
 		return config?.modules[moduleId] ?? false;
 	}
 
-	public async createUserLevel(
+	private async createUserLevel(
 		guildId: string,
 		userId: string,
 		userName: string
@@ -97,9 +97,19 @@ export class DatabaseManager {
 	}
 
 	public async getUserLevel(guildId: string, userId: string) {
-		return await this.repos.levels.findOne({
+		var userLevel = await this.repos.levels.findOne({
 			where: { guildId: guildId, userId: userId },
 		});
+		if (!userLevel) {
+			var user = await this.client.users.fetch(userId);
+			userLevel = await this.createUserLevel(
+				guildId,
+				userId,
+				user.username
+			);
+		}
+
+		return userLevel;
 	}
 
 	public async saveUserLevel(userLevel: UserLevelEntity) {
@@ -119,7 +129,7 @@ export class DatabaseManager {
 				highestInfractionId = infraction.infractionId;
 			}
 		});
-		let infraction = new InfractionEntity();
+		var infraction = new InfractionEntity();
 		infraction.guildId = guildId;
 		infraction.userId = userId;
 		infraction.infractionId = highestInfractionId + 1;
@@ -146,10 +156,6 @@ export class DatabaseManager {
 				infractionId: infractionId,
 			},
 		});
-	}
-
-	public async saveInfraction(infraction: InfractionEntity) {
-		return await this.repos.infractions.save(infraction);
 	}
 
 	public async deleteInfraction(userId: string, infractionId: number) {
