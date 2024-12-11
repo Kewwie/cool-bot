@@ -6,9 +6,6 @@ import {
 } from '@/types/command';
 import { Message, EmbedBuilder, User } from 'discord.js';
 
-/**
- * @type {PrefixCommand}
- */
 export const XpForLevelPrefix: PrefixCommand = {
 	config: {
 		name: 'xp-for-level',
@@ -22,10 +19,6 @@ export const XpForLevelPrefix: PrefixCommand = {
 		],
 	},
 
-	/**
-	 * @param {ChatInputCommandInteraction} interaction
-	 * @param {KiwiClient} client
-	 */
 	async execute(
 		client: KiwiClient,
 		message: Message,

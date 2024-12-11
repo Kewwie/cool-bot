@@ -4,12 +4,12 @@ import { Module } from '../../types/module';
 import { GuildCreate } from './events/guildCreate';
 import { GuildReady } from './events/guildReady';
 
-// Slash Commands
-import { ConfigSlash } from './slash/config';
+// Commands
+import { ConfigCommand } from './commands/config';
 
 export const ConfigModule: Module = {
 	id: 'config',
 	events: [GuildCreate, GuildReady],
-	slashCommands: [ConfigSlash],
+	prefixCommands: [ConfigCommand],
 	default: true,
 };

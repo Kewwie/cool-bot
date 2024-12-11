@@ -2,10 +2,10 @@ import {
 	Client,
 	GatewayIntentBits,
 	Partials,
-	Collection,
 	ColorResolvable,
 	ClientPresenceStatus,
 	Message,
+	TextChannel,
 } from 'discord.js';
 
 import { DatabaseManager } from './managers/databaseManager';
@@ -28,6 +28,8 @@ export class KiwiClient extends Client {
 	public CommandManager: CommandManager;
 	public ScheduleManager: ScheduleManager;
 	public ModuleManager: ModuleManager;
+
+	private _logChannel: TextChannel;
 
 	constructor() {
 		super({
@@ -87,6 +89,8 @@ export class KiwiClient extends Client {
 		var customId = new Array<string>();
 		for (var [key, value] of Object.entries(options)) {
 			if (customId.includes('&')) continue;
+			if (!key || !value) continue;
+			key = this.ComponentManager.getShortKey(key);
 			customId.push(`${key}=${value}`);
 		}
 		return customId.join('&');
@@ -101,7 +105,11 @@ export class KiwiClient extends Client {
 	}
 
 	public async getId(message: Message, value: string): Promise<string> {
-		if (value.startsWith('<@') && value.endsWith('>')) {
+		if (
+			value.startsWith('<@') &&
+			value.endsWith('>') &&
+			!value.startsWith('<@&')
+		) {
 			value = value.slice(2, -1);
 			if (value.startsWith('!')) {
 				value = value.slice(1);
@@ -128,6 +136,6 @@ export class KiwiClient extends Client {
 	}
 
 	public calculateXp(level: number) {
-        return 100 * Math.pow(level, 2) + 50 * level;
-    }
+		return 100 * Math.pow(level, 2) + 50 * level;
+	}
 }

@@ -1,12 +1,22 @@
-import { Collection, MessageComponentInteraction } from 'discord.js';
+import {
+	Collection,
+	Guild,
+	MessageComponentInteraction,
+	User,
+} from 'discord.js';
 import { KiwiClient } from '@/client';
 import { SelectMenu, Button, CustomOptions } from '@/types/component';
 import { EventList } from '@/types/event';
+import { Module } from '@/types/module';
 
 export class ComponentManager {
 	private client: KiwiClient;
 	public SelectMenus: Collection<string, SelectMenu>;
 	public Buttons: Collection<string, Button>;
+
+	public shortKeys: {
+		[key: string]: string;
+	};
 
 	constructor(client: KiwiClient) {
 		this.client = client;
@@ -17,6 +27,24 @@ export class ComponentManager {
 			EventList.InteractionCreate,
 			this.onInteraction.bind(this)
 		);
+
+		this.shortKeys = {
+			customId: 'ci',
+			ownerId: 'oi',
+			module: 'mo',
+			option: 'op',
+		};
+	}
+
+	public getShortKey(value: string): string {
+		return this.shortKeys[value] || value;
+	}
+
+	public getKeyFromShort(value: string): string {
+		var key = Object.keys(this.shortKeys).find(
+			(key) => this.shortKeys[key] === value
+		);
+		return key;
 	}
 
 	public registerSelectMenu(selectMenu: SelectMenu) {
@@ -34,7 +62,8 @@ export class ComponentManager {
 
 		const config: CustomOptions = {};
 		for (const x of interaction.customId.split('&')) {
-			const [key, value] = x.split('=');
+			var [key, value] = x.split('=');
+			key = this.getKeyFromShort(key);
 			config[key] = value;
 		}
 
@@ -50,24 +79,20 @@ export class ComponentManager {
 				return;
 			}
 
-			/*if (
-				interaction.guildId &&
-				selectMenu.module &&
-				!selectMenu.module?.default
-			) {
-				let isEnabled =
-					await this.client.db.repos.guildModules.findOneBy({
-						guildId: interaction.guildId,
-						moduleId: selectMenu.module.id,
-					});
-				if (!isEnabled) {
+			if (interaction.guildId) {
+				var checks = await this.client.ModuleManager.checkGuild(
+					interaction.guild,
+					interaction.user,
+					selectMenu.module
+				);
+				if (!checks.status) {
 					interaction.reply({
-						content: `This select menu is disabled!`,
+						content: checks.response,
 						ephemeral: true,
 					});
 					return;
 				}
-			}*/
+			}
 
 			try {
 				await selectMenu.execute(interaction, config, this.client);
@@ -90,24 +115,20 @@ export class ComponentManager {
 				return;
 			}
 
-			/*if (
-				interaction.guildId &&
-				button.module &&
-				!button.module?.default
-			) {
-				let isEnabled =
-					await this.client.db.repos.guildModules.findOneBy({
-						guildId: interaction.guildId,
-						moduleId: button.module.id,
-					});
-				if (!isEnabled) {
+			if (interaction.guildId) {
+				var checks = await this.client.ModuleManager.checkGuild(
+					interaction.guild,
+					interaction.user,
+					button.module
+				);
+				if (!checks.status) {
 					interaction.reply({
-						content: `This button is disabled!`,
+						content: checks.response,
 						ephemeral: true,
 					});
 					return;
 				}
-			}*/
+			}
 
 			try {
 				await button.execute(interaction, config, this.client);

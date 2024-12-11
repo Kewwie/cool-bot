@@ -1,3 +1,10 @@
+import {
+	PermissionFlags,
+	PermissionFlagsBits,
+	PermissionResolvable,
+	Permissions,
+} from 'discord.js';
+
 import { PrefixCommand } from './command';
 import { SlashCommand } from './command';
 import { UserCommand } from './command';
@@ -7,6 +14,7 @@ import { Schedule } from './schedule';
 
 export interface Module {
 	id: string;
+	permissions?: PermissionResolvable[];
 	name?: string;
 	events?: Event[];
 	prefixCommands?: PrefixCommand[];
@@ -18,6 +26,5 @@ export interface Module {
 	functions?: { [key: string]: Function };
 	default?: boolean;
 	hidden?: boolean;
-	staffOnly?: boolean;
-	staffServer?: string;
+	developerOnly?: boolean;
 }

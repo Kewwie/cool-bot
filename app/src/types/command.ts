@@ -19,10 +19,12 @@ export interface PrefixCommand {
 		name: string;
 		description?: string;
 		aliases?: string[];
-		autoDelete: boolean;
+		autoDelete?: boolean;
 		options?: {
 			name: string;
 			type: ConfigOptionTypes;
+			maxValue?: number;
+			includeAfter?: boolean;
 			selfDefault?: boolean;
 		}[];
 	};
@@ -52,8 +54,8 @@ export enum ConfigOptionTypes {
 export interface CommandOptions {
 	commandName: string;
 	auther: string;
-	//args: string[];
-	[key: string]: User | GuildMember | Channel | Role | string;
+	module: Module;
+	command: PrefixCommand;
 }
 
 export interface UserCommand {

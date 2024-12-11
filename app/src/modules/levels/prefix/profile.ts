@@ -6,9 +6,6 @@ import {
 } from '@/types/command';
 import { Message, EmbedBuilder, User } from 'discord.js';
 
-/**
- * @type {PrefixCommand}
- */
 export const ProfilePrefix: PrefixCommand = {
 	config: {
 		name: 'profile',
@@ -23,10 +20,6 @@ export const ProfilePrefix: PrefixCommand = {
 		],
 	},
 
-	/**
-	 * @param {ChatInputCommandInteraction} interaction
-	 * @param {KiwiClient} client
-	 */
 	async execute(
 		client: KiwiClient,
 		message: Message,

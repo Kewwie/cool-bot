@@ -9,7 +9,7 @@ import {
 	CommandOptions,
 	ConfigOptionTypes,
 } from '@/types/command';
-import { Collection, Message, TextChannel, User } from 'discord.js';
+import { Collection, Message, TextChannel } from 'discord.js';
 import { EventList } from '@/types/event';
 
 export class CommandManager {
@@ -19,8 +19,6 @@ export class CommandManager {
 	public UserCommands: Collection<string, UserCommand>;
 	private RestAPI: REST;
 
-	public staffServerCommands: any[];
-
 	constructor(client: KiwiClient) {
 		this.client = client;
 
@@ -28,8 +26,6 @@ export class CommandManager {
 		this.SlashCommands = new Collection();
 		this.UserCommands = new Collection();
 		this.RestAPI = new REST({ version: '10' }).setToken(env.CLIENT_TOKEN);
-
-		this.staffServerCommands = [];
 
 		this.client.on(
 			EventList.InteractionCreate,
@@ -89,25 +85,22 @@ export class CommandManager {
 
 			if (!command) return;
 
+			if (interaction.guildId) {
+				var checks = await this.client.ModuleManager.checkGuild(
+					interaction.guild,
+					interaction.user,
+					command.module
+				);
+				if (!checks.status) {
+					interaction.reply({
+						content: checks.response,
+						ephemeral: true,
+					});
+					return;
+				}
+			}
+
 			try {
-				/*if (
-					interaction.guildId &&
-					command.module &&
-					!command.module?.default
-				) {
-					let isEnabled =
-						await this.client.db.repos.guildModules.findOneBy({
-							guildId: interaction.guildId,
-							moduleId: command.module.id,
-						});
-					if (!isEnabled) {
-						interaction.reply({
-							content: `This command is disabled!`,
-							ephemeral: true,
-						});
-						return;
-					}
-				}*/
 				await command.execute(interaction, this.client);
 			} catch (error) {
 				console.error(error);
@@ -135,25 +128,22 @@ export class CommandManager {
 
 			if (!command) return;
 
+			if (interaction.guildId) {
+				var checks = await this.client.ModuleManager.checkGuild(
+					interaction.guild,
+					interaction.user,
+					command.module
+				);
+				if (!checks.status) {
+					interaction.reply({
+						content: checks.response,
+						ephemeral: true,
+					});
+					return;
+				}
+			}
+
 			try {
-				/*if (
-					interaction.guildId &&
-					command.module &&
-					!command.module?.default
-				) {
-					let isEnabled =
-						await this.client.db.repos.guildModules.findOneBy({
-							guildId: interaction.guildId,
-							moduleId: command.module.id,
-						});
-					if (!isEnabled) {
-						interaction.reply({
-							content: `This command is disabled!`,
-							ephemeral: true,
-						});
-						return;
-					}
-				}*/
 				await command.execute(interaction, this.client);
 			} catch (error) {
 				console.error(error);
@@ -179,101 +169,119 @@ export class CommandManager {
 		let command = this.PrefixCommands.get(commandName);
 		if (!command) return;
 
+		var channel = message.channel as TextChannel;
+
 		if (command.config.autoDelete) {
 			message.delete();
 		}
 
-		var channel = message.channel as TextChannel;
+		if (message.guildId) {
+			var checks = await this.client.ModuleManager.checkGuild(
+				message.guild,
+				message.author,
+				command.module
+			);
+			if (!checks.status) {
+				await channel.send(checks.response);
+				return;
+			}
+		}
 
 		var commandOptions: CommandOptions = {
 			commandName: commandName,
 			auther: message.author.id,
+			module: command.module,
+			command: command,
 		};
 
 		var count = 0;
 		var args = new Array();
-		for (let option of command.config.options) {
-			if (!textArgs[count] && !option.selfDefault) {
-				channel.send({
-					content: `You must provide a ${option.name}`,
-				});
-				return;
-			}
-			if (option.type === ConfigOptionTypes.TEXT) {
-				args.push(textArgs[count]);
-			} else if (option.type === ConfigOptionTypes.NUMBER) {
-				var number = parseInt(textArgs[count]);
-				if (isNaN(number)) {
+		if (command.config.options) {
+			for (let option of command.config.options) {
+				if (!textArgs[count]) {
 					channel.send({
-						content: `You must provide a valid number`,
+						content: `You must provide a ${option.name}`,
 					});
 					return;
 				}
-				args.push(number);
-			} else {
-				var id;
-				if (!textArgs[count] && option.selfDefault) {
-					id = message.author.id;
+
+				if (option.type === ConfigOptionTypes.TEXT) {
+					if (option.includeAfter) {
+						args.push(textArgs.slice(count).join(' '));
+					} else {
+						args.push(textArgs[count]);
+					}
+				} else if (option.type === ConfigOptionTypes.NUMBER) {
+					var number = parseInt(textArgs[count]);
+					if (isNaN(number)) {
+						channel.send({
+							content: `You must provide a valid number`,
+						});
+						return;
+					}
+					if (option.maxValue && number > option.maxValue) {
+						channel.send({
+							content: `You must provide a number less than ${option.maxValue}`,
+						});
+						return;
+					}
+					args.push(number);
+				} else if (option.type === ConfigOptionTypes.OPTIONS) {
+					if (!option.options?.includes(textArgs[count])) {
+						channel.send({
+							content: `You must provide a valid ${
+								option.name
+							} which is one of these ${option.options.join(
+								', '
+							)}`,
+						});
+						return;
+					}
+					args.push(textArgs[count]);
 				} else {
-					id = await this.client.getId(message, textArgs[count]);
-					if (!id) {
+					var id = await this.client.getId(message, textArgs[count]);
+					if (!id && !option.selfDefault) {
+						channel.send({
+							content: `You must provide a valid ${option.name}`,
+						});
+						return;
+					}
+
+					var entry;
+					if (option.type === ConfigOptionTypes.USER) {
+						if (!id && option.selfDefault) {
+							id = message.author.id;
+						}
+						entry = await this.client.users.fetch(id);
+						args.push(entry);
+					} else if (option.type === ConfigOptionTypes.MEMBER) {
+						if (!id && option.selfDefault) {
+							id = message.author.id;
+						}
+						entry = await message.guild?.members.fetch(id);
+						args.push(entry);
+					} else if (option.type === ConfigOptionTypes.CHANNEL) {
+						if (!id && option.selfDefault) {
+							id = message.channel.id;
+						}
+						entry = await message.guild?.channels.fetch(id);
+						args.push(entry);
+					} else if (option.type === ConfigOptionTypes.ROLE && id) {
+						entry = await message.guild?.roles.fetch(id);
+						args.push(entry);
+					}
+					if (!entry) {
 						channel.send({
 							content: `You must provide a valid ${option.name}`,
 						});
 						return;
 					}
 				}
-
-				var entry;
-				if (option.type === ConfigOptionTypes.USER) {
-					entry = await this.client.users.fetch(id);
-					args.push(entry);
-				} else if (option.type === ConfigOptionTypes.MEMBER) {
-					entry = await message.guild?.members.fetch(id);
-					args.push(entry);
-				} else if (option.type === ConfigOptionTypes.CHANNEL) {
-					entry = await message.guild?.channels.fetch(id);
-					args.push(entry);
-				} else if (option.type === ConfigOptionTypes.ROLE) {
-					entry = await message.guild?.roles.fetch(id);
-					args.push(entry);
-				}
-				if (!entry) {
-					channel.send({
-						content: `You must provide a valid ${option.name}`,
-					});
-					return;
-				}
+				count++;
 			}
-			count++;
 		}
 
 		try {
-			/*if (message.guildId && command.module && !command.module?.default) {
-				let isEnabled =
-					await await this.client.db.repos.guildModules.findOneBy({
-						guildId: message.guildId,
-						moduleId: command.module.id,
-					});
-				if (!isEnabled) {
-					channel.send({ content: `This command is disabled!` });
-					return;
-				}
-			}*/
-			if (message.guildId && command.module && command.checks) {
-				var passedChecks = await command.checks(
-					this.client,
-					message,
-					commandOptions,
-					...args
-				);
-				if (!passedChecks) {
-					channel.send({
-						content: `You do not have permission to use this command!`,
-					});
-					return;
-				}
-			}
 			await command.execute(
 				this.client,
 				message,
