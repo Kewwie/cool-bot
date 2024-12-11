@@ -1,10 +1,10 @@
 export const Emojis = {
 	progressBar: {
-		emptyStart: '██',
-		emptyMiddle: '██',
-		emptyEnd: '██',
-		filledStart: '░░',
-		filledMiddle: '░░',
-		filledEnd: '░░',
+		filledStart: '██',
+		filledMiddle: '██',
+		filledEnd: '██',
+		emptyStart: '░░',
+		emptyMiddle: '░░',
+		emptyEnd: '░░',
 	},
 };
