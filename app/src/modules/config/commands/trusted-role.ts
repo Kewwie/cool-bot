@@ -15,12 +15,16 @@ import {
 export const TrustedRoleCommand: SlashCommand = {
 	config: new SlashCommandBuilder()
 		.setName('trusted-role')
+		.setDescription('Manage trusted role for the server')
 		.addSubcommand((subcommand) =>
 			subcommand
 				.setName('set')
 				.setDescription('Set a trusted role for the server')
 				.addRoleOption((option) =>
-					option.setName('role').setRequired(true)
+					option
+						.setName('role')
+						.setDescription('The role to set as trusted')
+						.setRequired(true)
 				)
 		)
 		.addSubcommand((subcommand) =>

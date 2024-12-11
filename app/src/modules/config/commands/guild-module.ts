@@ -19,6 +19,7 @@ export const GuildModuleCommand: SlashCommand = {
 					option
 						.setName('module')
 						.setRequired(true)
+						.setDescription('The module to toggle')
 						.addChoices([{ name: 'Levels', value: 'levels' }])
 				)
 		)
