@@ -99,6 +99,9 @@ export class KiwiClient extends Client {
 		total: number,
 		length: number
 	) {
+		if (progress > total) progress = total;
+		if (progress < 0) progress = 0;
+
 		var filledBlocks = Math.floor((progress / total) * length);
 		var emptyBlocks = length - filledBlocks;
 		var progressBar = '';
@@ -107,8 +110,10 @@ export class KiwiClient extends Client {
 			filledBlocks > 0
 				? Emojis.progressBar.filledStart
 				: Emojis.progressBar.emptyStart;
-		progressBar += Emojis.progressBar.filledMiddle.repeat(filledBlocks - 1);
-		progressBar += Emojis.progressBar.emptyMiddle.repeat(emptyBlocks - 1);
+		if (filledBlocks > 1) filledBlocks--;
+		progressBar += Emojis.progressBar.filledMiddle.repeat(filledBlocks);
+		if (emptyBlocks > 1) emptyBlocks--;
+		progressBar += Emojis.progressBar.emptyMiddle.repeat(emptyBlocks);
 		progressBar +=
 			filledBlocks === length
 				? Emojis.progressBar.filledEnd
