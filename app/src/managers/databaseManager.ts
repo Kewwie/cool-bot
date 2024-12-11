@@ -33,9 +33,7 @@ export class DatabaseManager {
 
 	public async generateConfigs(guildId: string) {
 		var config = await this.getGuildConfig(guildId);
-		console.log(config, 1011);
 		if (!config) {
-			console.log('Creating new config', 1013);
 			config = new ConfigEntity();
 			config.guildId = guildId;
 		}
@@ -58,12 +56,15 @@ export class DatabaseManager {
 		if (!config.levelUpChannel) {
 			config.levelUpChannel = null;
 		}
-		for (var module of this.client.ModuleManager.Modules.keys()) {
-			if (!config.modules[module]) {
-				config.modules[module] = false;
+		for (var module of this.client.ModuleManager.Modules) {
+			if (
+				!config.modules[module[0]] &&
+				!module[1].default &&
+				!module[1].developerOnly
+			) {
+				config.modules[module[0]] = false;
 			}
 		}
-		console.log(config, 1040);
 
 		return await this.saveGuildConfig(config);
 	}
