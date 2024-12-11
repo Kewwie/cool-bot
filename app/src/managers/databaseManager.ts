@@ -33,6 +33,7 @@ export class DatabaseManager {
 
 	public async generateConfigs(guildId: string) {
 		var config = await this.getGuildConfig(guildId);
+		console.log(config, 1011);
 		if (!config) {
 			config = new ConfigEntity();
 			config.guildId = guildId;
