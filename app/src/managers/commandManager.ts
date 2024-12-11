@@ -240,7 +240,7 @@ export class CommandManager {
 					args.push(textArgs[count]);
 				} else {
 					var id;
-					if (!option.defaultSelf) {
+					if (!option.defaultSelf || textArgs[count]) {
 						id = await this.client.getId(message, textArgs[count]);
 						if (!id) {
 							channel.send({
