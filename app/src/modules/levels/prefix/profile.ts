@@ -53,6 +53,9 @@ export const ProfilePrefix: PrefixCommand = {
 			.setThumbnail(user.displayAvatarURL())
 			.setDescription(profileDescription);
 
-		message.reply({ embeds: [profileEmbed] });
+		message.reply({
+			embeds: [profileEmbed],
+			allowedMentions: { parse: [] },
+		});
 	},
 };
