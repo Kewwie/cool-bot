@@ -7,12 +7,13 @@ import { GuildReady } from './events/guildReady';
 
 // Commands
 import { GuildModuleCommand } from './commands/guild-module';
+import { LevelRewardCommand } from './commands/level-reward';
 import { TrustedRoleCommand } from './commands/trusted-role';
 
 export const ConfigModule: Module = {
 	id: 'config',
 	permissions: [PermissionFlagsBits.Administrator],
 	events: [GuildCreate, GuildReady],
-	slashCommands: [TrustedRoleCommand, GuildModuleCommand],
+	slashCommands: [TrustedRoleCommand, LevelRewardCommand, GuildModuleCommand],
 	default: true,
 };
