@@ -81,10 +81,7 @@ export class DatabaseManager {
 		let config = await this.repos.config.findOne({
 			where: { guildId: guildId },
 		});
-		if (config?.modules[moduleId]) {
-			return true;
-		}
-		return false;
+		return config?.modules[moduleId] ?? false;
 	}
 
 	public async createUserLevel(
