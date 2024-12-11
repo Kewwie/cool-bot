@@ -37,14 +37,15 @@ export const MessageCreate: Event = {
 					channel = message.channel;
 				}
 
-				channel.send(
-					guildConfig.levelUpMessage
+				channel.send({
+					content: guildConfig.levelUpMessage
 						.replace('{userMention}', `<@${message.author.id}>`)
 						.replace('{userName}', message.author.username)
 						.replace('{userId}', message.author.id.toString())
 						.replace('{level}', userLevel.level.toString())
-						.replace('{xp}', userLevel.xp.toString())
-				);
+						.replace('{xp}', userLevel.xp.toString()),
+					allowMentions: { parse: [] },
+				});
 			}
 
 			if (guildConfig?.levelRewards) {
