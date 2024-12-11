@@ -56,6 +56,9 @@ export class DatabaseManager {
 		if (!config.levelUpChannel) {
 			config.levelUpChannel = null;
 		}
+		if (!config.modules) {
+			config.modules = {};
+		}
 		for (var module of this.client.ModuleManager.Modules) {
 			if (
 				!config.modules[module[0]] &&
