@@ -22,6 +22,7 @@ export class EventManager {
 		}
 
 		client.ModuleManager.register();
+		await client.CommandManager.register([]);
 
 		for (let guild of await client.guilds.fetch()) {
 			client.ModuleManager.registerCommands(

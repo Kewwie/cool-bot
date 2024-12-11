@@ -108,7 +108,7 @@ export const LevelRewardCommand: SlashCommand = {
 			case 'view': {
 				let rewards = Object.entries(cfg.levelRewards).map(
 					([level, reward]) =>
-						`**Level:** ${level}\n**Role:** <@&${reward.roleId}>`
+						`**Level:** ${level}\n**Role:** <@&${reward.roleId}>\n**Permanent:** ${reward.permanent}`
 				);
 				if (!rewards.length) {
 					interaction.reply({
