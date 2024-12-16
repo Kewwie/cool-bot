@@ -1,16 +1,16 @@
-import { REST } from '@discordjs/rest';
-import { Routes } from 'discord-api-types/v10';
-import { env } from '@/env';
-import { KiwiClient } from '@/client';
+import { REST } from "@discordjs/rest";
+import { Routes } from "discord-api-types/v10";
+import { env } from "@/env";
+import { KiwiClient } from "@/client";
 import {
 	PrefixCommand,
 	SlashCommand,
 	UserCommand,
 	CommandOptions,
 	ConfigOptionTypes,
-} from '@/types/command';
-import { Collection, Message, TextChannel } from 'discord.js';
-import { EventList } from '@/types/event';
+} from "@/types/command";
+import { Collection, Message, TextChannel } from "discord.js";
+import { EventList } from "@/types/event";
 
 export class CommandManager {
 	public client: KiwiClient;
@@ -25,12 +25,9 @@ export class CommandManager {
 		this.PrefixCommands = new Collection();
 		this.SlashCommands = new Collection();
 		this.UserCommands = new Collection();
-		this.RestAPI = new REST({ version: '10' }).setToken(env.CLIENT_TOKEN);
+		this.RestAPI = new REST({ version: "10" }).setToken(env.CLIENT_TOKEN);
 
-		this.client.on(
-			EventList.InteractionCreate,
-			this.onInteraction.bind(this)
-		);
+		this.client.on(EventList.InteractionCreate, this.onInteraction.bind(this));
 		this.client.on(EventList.MessageCreate, this.onMessage.bind(this));
 	}
 
@@ -55,10 +52,9 @@ export class CommandManager {
 				body: commands,
 			});
 		} else {
-			this.RestAPI.put(
-				Routes.applicationGuildCommands(env.CLIENT_ID, guildId),
-				{ body: commands }
-			);
+			this.RestAPI.put(Routes.applicationGuildCommands(env.CLIENT_ID, guildId), {
+				body: commands,
+			});
 		}
 	}
 
@@ -69,10 +65,9 @@ export class CommandManager {
 					body: [],
 				});
 			} else {
-				this.RestAPI.put(
-					Routes.applicationGuildCommands(env.CLIENT_ID, guildId),
-					{ body: [] }
-				);
+				this.RestAPI.put(Routes.applicationGuildCommands(env.CLIENT_ID, guildId), {
+					body: [],
+				});
 			}
 		} catch (error) {
 			console.log(error);
@@ -105,7 +100,7 @@ export class CommandManager {
 			} catch (error) {
 				console.error(error);
 				await interaction.reply({
-					content: 'There is an issue!',
+					content: "There is an issue!",
 					ephemeral: true,
 				});
 			}
@@ -119,7 +114,7 @@ export class CommandManager {
 			} catch (error) {
 				console.error(error);
 				await interaction.reply({
-					content: 'There is an issue!',
+					content: "There is an issue!",
 					ephemeral: true,
 				}); // Fix this to respond in autocomplete
 			}
@@ -148,7 +143,7 @@ export class CommandManager {
 			} catch (error) {
 				console.error(error);
 				await interaction.reply({
-					content: 'There is an issue!',
+					content: "There is an issue!",
 					ephemeral: true,
 				});
 			}
@@ -159,10 +154,7 @@ export class CommandManager {
 		if (message.author.bot) return;
 		if (!message.content.startsWith(env.PREFIX)) return;
 
-		let textArgs = message.content
-			.slice(env.PREFIX.length)
-			.trim()
-			.split(/ +/);
+		let textArgs = message.content.slice(env.PREFIX.length).trim().split(/ +/);
 		let commandName = textArgs.shift()?.toLowerCase();
 		if (!commandName) return;
 
@@ -192,22 +184,26 @@ export class CommandManager {
 			auther: message.author.id,
 			module: command.module,
 			command: command,
+			channel: message.channel as TextChannel,
 		};
 
 		var count = 0;
 		var args = new Array();
 		if (command.config.options) {
 			for (let option of command.config.options) {
-				if (!textArgs[count] && !option.defaultSelf) {
+				if (!textArgs[count] && !option.defaultSelf && !option.optional) {
 					channel.send({
 						content: `You must provide a ${option.name}`,
 					});
 					return;
+				} else if (option.optional && !textArgs[count]) {
+					if (option.default) args.push(option.default);
+					continue;
 				}
 
 				if (option.type === ConfigOptionTypes.TEXT) {
 					if (option.includeAfter) {
-						args.push(textArgs.slice(count).join(' '));
+						args.push(textArgs.slice(count).join(" "));
 					} else {
 						args.push(textArgs[count]);
 					}
@@ -231,9 +227,7 @@ export class CommandManager {
 						channel.send({
 							content: `You must provide a valid ${
 								option.name
-							} which is one of these ${option.options.join(
-								', '
-							)}`,
+							} which is one of these ${option.options.join(", ")}`,
 						});
 						return;
 					}
@@ -285,15 +279,10 @@ export class CommandManager {
 		}
 
 		try {
-			await command.execute(
-				this.client,
-				message,
-				commandOptions,
-				...args
-			);
+			await command.execute(this.client, message, commandOptions, ...args);
 		} catch (error) {
 			console.error(error);
-			await channel.send('There is an issue!');
+			await channel.send("There is an issue!");
 		}
 	}
 }
