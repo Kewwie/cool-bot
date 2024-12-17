@@ -28,6 +28,13 @@ export const UpdateXpPrefix: PrefixCommand = {
 		user: User,
 		amount: number
 	) {
-		commandOptions.channel.send("Updating xp coming soon");
+		var userLevel = await client.db.getUserLevel(message.guild.id, user.id);
+		if (!userLevel) {
+			message.reply("User has no profile");
+			return;
+		}
+		userLevel.xp += amount;
+		await client.db.saveUserLevel(userLevel);
+		commandOptions.channel.send("User xp updated");
 	},
 };
