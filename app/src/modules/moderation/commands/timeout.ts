@@ -1,6 +1,6 @@
 import { KiwiClient } from "@/client";
 import { CommandOptions, ConfigOptionTypes, PrefixCommand } from "@/types/command";
-import { Message, GuildMember, EmbedBuilder } from "discord.js";
+import { Message, GuildMember, EmbedBuilder, PermissionFlagsBits } from "discord.js";
 
 export const TimeoutPrefix: PrefixCommand = {
 	config: {
@@ -8,6 +8,7 @@ export const TimeoutPrefix: PrefixCommand = {
 		description: "Timeout a member",
 		aliases: ["time", "t"],
 		autoDelete: false,
+		defaultPermissions: [PermissionFlagsBits.ModerateMembers],
 		options: [
 			{
 				name: "member",
@@ -52,6 +53,7 @@ export const TimeoutPrefix: PrefixCommand = {
 				)
 				.setFooter({ text: `Moderator: ${message.author.username}` });
 			commandOptions.channel.send({ embeds: [timeoutEmbed] });
+			client.db.createInfraction(message.guild.id, member.id, member.user.username, reason);
 		} catch (error) {
 			commandOptions.channel.send("Could not timeout user");
 		}
