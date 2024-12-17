@@ -1,11 +1,11 @@
-import { DataSource, Repository } from 'typeorm';
-import { KiwiClient } from '@/client';
+import { DataSource, Repository } from "typeorm";
+import { KiwiClient } from "@/client";
 
-import { dataSource } from '@/datasource';
+import { dataSource } from "@/datasource";
 
-import { ConfigEntity } from '@/entities/Config';
-import { UserLevelEntity } from '@/entities/UserLevel';
-import { InfractionEntity } from '@/entities/Infraction';
+import { ConfigEntity } from "@/entities/Config";
+import { UserLevelEntity } from "@/entities/UserLevel";
+import { InfractionEntity } from "@/entities/Infraction";
 
 export class DatabaseManager {
 	public dataSource: DataSource;
@@ -38,20 +38,17 @@ export class DatabaseManager {
 			config.guildId = guildId;
 		}
 		if (!config.prefix) {
-			config.prefix = '!';
+			config.prefix = "!";
 		}
 		if (!config.trustedRole) {
 			config.trustedRole = null;
-		}
-		if (!config.roles) {
-			config.roles = {};
 		}
 		if (!config.levelRewards) {
 			config.levelRewards = [];
 		}
 		if (!config.levelUpMessage) {
 			config.levelUpMessage =
-				'**Congrats {userMention} you have leveled up to level {level}!**';
+				"**Congrats {userMention} you have leveled up to level {level}!**";
 		}
 		if (!config.levelUpChannel) {
 			config.levelUpChannel = null;
@@ -60,13 +57,13 @@ export class DatabaseManager {
 			config.modules = {};
 		}
 		for (var module of this.client.ModuleManager.Modules) {
-			if (
-				!config.modules[module[0]] &&
-				!module[1].default &&
-				!module[1].developerOnly
-			) {
+			if (!config.modules[module[0]] && !module[1].default && !module[1].developerOnly) {
 				config.modules[module[0]] = false;
 			}
+		}
+
+		if (!config.permissions) {
+			config.permissions = [];
 		}
 
 		return await this.saveGuildConfig(config);
@@ -87,11 +84,7 @@ export class DatabaseManager {
 		return config?.modules[moduleId] ?? false;
 	}
 
-	private async createUserLevel(
-		guildId: string,
-		userId: string,
-		userName: string
-	) {
+	private async createUserLevel(guildId: string, userId: string, userName: string) {
 		let userLevel = new UserLevelEntity();
 		userLevel.guildId = guildId;
 		userLevel.userId = userId;
@@ -105,11 +98,7 @@ export class DatabaseManager {
 		});
 		if (!userLevel) {
 			var user = await this.client.users.fetch(userId);
-			userLevel = await this.createUserLevel(
-				guildId,
-				userId,
-				user.username
-			);
+			userLevel = await this.createUserLevel(guildId, userId, user.username);
 		}
 
 		return userLevel;
@@ -147,11 +136,7 @@ export class DatabaseManager {
 		});
 	}
 
-	public async getInfraction(
-		guildId: string,
-		userId: string,
-		infractionId: number
-	) {
+	public async getInfraction(guildId: string, userId: string, infractionId: number) {
 		return await this.repos.infractions.findOne({
 			where: {
 				guildId: guildId,

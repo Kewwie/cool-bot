@@ -1,41 +1,50 @@
-import { Entity, ObjectIdColumn, ObjectId, Column } from 'typeorm';
+import { Entity, ObjectIdColumn, ObjectId, Column } from "typeorm";
 
-@Entity('config')
+@Entity("config")
 export class ConfigEntity {
 	@ObjectIdColumn()
 	id: ObjectId;
 
-	@Column('guild_id')
+	@Column("guild_id")
 	guildId: string;
 
-	@Column('prefix')
+	@Column("prefix")
 	prefix: string;
 
-	@Column('trusted_role')
+	@Column("trusted_role")
 	trustedRole: string;
 
-	@Column('roles')
+	@Column("roles")
 	roles: {
 		[id: string]: {
 			[command: string]: boolean;
 		};
 	};
 
-	@Column('level_reward')
+	@Column("level_reward")
 	levelRewards: {
 		roleId: string;
 		level: number;
 		permanent: boolean;
 	}[];
 
-	@Column('level_up_message')
+	@Column("level_up_message")
 	levelUpMessage: string;
 
-	@Column('level_up_channel')
+	@Column("level_up_channel")
 	levelUpChannel: string;
 
-	@Column('modules')
+	@Column("modules")
 	modules: {
 		[moduleId: string]: boolean;
 	};
+
+	@Column("permissions")
+	/*permissions: {
+		[roleId: string]: string[];
+	};*/
+	permissions: {
+		roleId: string;
+		commands: string[];
+	}[];
 }
