@@ -1,7 +1,7 @@
-import { Collection, Guild, User } from 'discord.js';
-import { KiwiClient } from '@/client';
-import { Module } from '@/types/module';
-import { env } from '@/env';
+import { Collection, Guild, User } from "discord.js";
+import { KiwiClient } from "@/client";
+import { Module } from "@/types/module";
+import { env } from "@/env";
 
 export class ModuleManager {
 	private client: KiwiClient;
@@ -85,10 +85,7 @@ export class ModuleManager {
 		}
 
 		if (!module?.default) {
-			var isEnabled = await this.client.db.isModuleEnabled(
-				guild.id,
-				module.id
-			);
+			var isEnabled = await this.client.db.isModuleEnabled(guild.id, module.id);
 			if (!isEnabled) {
 				return {
 					response: `This module is disabled!`,
@@ -96,6 +93,13 @@ export class ModuleManager {
 				};
 			}
 		}
+
+		return {
+			status: true,
+		};
+	}
+
+	public async checkPermissions(guild: Guild, user: User, module: Module) {
 		if (module.permissions) {
 			var member = await guild.members.fetch(user.id);
 			var hasPermission = false;

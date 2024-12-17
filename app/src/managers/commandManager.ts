@@ -177,6 +177,20 @@ export class CommandManager {
 			var permissionExists = cfg.permissions.find((perm) =>
 				perm.commands.includes(commandName)
 			);
+
+			var checks = await this.client.ModuleManager.checkGuild(
+				message.guild,
+				message.author,
+				command.module
+			);
+			if (checks.status) userAllowed = true;
+			else if (!checks.status) {
+				channel.send({
+					content: checks.response,
+				});
+				return;
+			}
+
 			for (var role of member.roles.cache.values()) {
 				var perm = cfg.permissions.find((perm) => perm.roleId === role.id);
 				if (perm && perm.commands.includes(commandName)) {
@@ -197,7 +211,7 @@ export class CommandManager {
 			}
 
 			if (!userAllowed) {
-				var checks = await this.client.ModuleManager.checkGuild(
+				var checks = await this.client.ModuleManager.checkPermissions(
 					message.guild,
 					message.author,
 					command.module
