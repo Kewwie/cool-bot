@@ -5,4 +5,4 @@ import { ConfigModule } from "./config/module";
 import { LevelsModule } from "./levels/module";
 import { ModerationModule } from "./moderation/module";
 
-export const ClientModules: Module[] = [ConfigModule, LevelsModule];
+export const ClientModules: Module[] = [ConfigModule, LevelsModule, ModerationModule];
