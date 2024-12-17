@@ -9,7 +9,7 @@ import { TimeoutPrefix } from "./commands/timeout";
 import { CheckInfracitonsSchedule } from "./schedules/checkInfractions";
 
 export const ModerationModule: Module = {
-	id: "Moderation",
+	id: "moderation",
 	prefixCommands: [BanPrefix, InfractionsPrefix, TimeoutPrefix],
 	schedules: [CheckInfracitonsSchedule],
 };
