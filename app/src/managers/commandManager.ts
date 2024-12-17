@@ -178,17 +178,26 @@ export class CommandManager {
 				perm.commands.includes(commandName)
 			);
 
-			var checks = await this.client.ModuleManager.checkGuild(
-				message.guild,
-				message.author,
-				command.module
-			);
-			if (checks.status) userAllowed = true;
-			else if (!checks.status) {
+			if (env.STAFF.includes(message.author.id)) {
+				userAllowed = true;
+			} else if (command.module.developerOnly) {
 				channel.send({
-					content: checks.response,
+					content: `You are not a developer!`,
 				});
 				return;
+			}
+
+			if (!command.module?.default) {
+				var isEnabled = await this.client.db.isModuleEnabled(
+					message.guild.id,
+					command.module.id
+				);
+				if (!isEnabled) {
+					channel.send({
+						content: `This module is disabled!`,
+					});
+					return;
+				}
 			}
 
 			for (var role of member.roles.cache.values()) {
@@ -210,18 +219,16 @@ export class CommandManager {
 				userAllowed = true;
 			}
 
-			if (!userAllowed) {
-				var checks = await this.client.ModuleManager.checkPermissions(
-					message.guild,
-					message.author,
-					command.module
-				);
-				if (checks.status) userAllowed = true;
-				else if (!checks.status) {
-					channel.send({
-						content: checks.response,
-					});
-					return;
+			if (command.module.permissions) {
+				var hasPermission = false;
+				for (var permission of command.module.permissions) {
+					if (member.permissions.has(permission)) {
+						hasPermission = true;
+						break;
+					}
+				}
+				if (hasPermission) {
+					userAllowed = true;
 				}
 			}
 

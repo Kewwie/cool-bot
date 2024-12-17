@@ -94,12 +94,6 @@ export class ModuleManager {
 			}
 		}
 
-		return {
-			status: true,
-		};
-	}
-
-	public async checkPermissions(guild: Guild, user: User, module: Module) {
 		if (module.permissions) {
 			var member = await guild.members.fetch(user.id);
 			var hasPermission = false;
