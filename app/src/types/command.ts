@@ -11,6 +11,7 @@ import {
 	Channel,
 	Role,
 	TextChannel,
+	PermissionResolvable,
 } from "discord.js";
 
 export interface PrefixCommand {
@@ -21,6 +22,7 @@ export interface PrefixCommand {
 		description?: string;
 		aliases?: string[];
 		autoDelete?: boolean;
+		defaultPermissions?: PermissionResolvable[];
 		options?: {
 			name: string;
 			type: ConfigOptionTypes;

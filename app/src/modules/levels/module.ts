@@ -1,14 +1,15 @@
-import { Module } from '@/types/module';
+import { Module } from "@/types/module";
 
 // Events
-import { MessageCreate } from './events/messageCreate';
+import { MessageCreate } from "./events/messageCreate";
 
 // Prefix Commands
-import { ProfilePrefix } from './prefix/profile';
-import { XpForLevelPrefix } from './prefix/xp-for-level';
+import { ProfilePrefix } from "./prefix/profile";
+import { UpdateXpPrefix } from "./prefix/update-xp";
+import { XpForLevelPrefix } from "./prefix/xp-for-level";
 
 export const LevelsModule: Module = {
-	id: 'levels',
+	id: "levels",
 	events: [MessageCreate],
-	prefixCommands: [ProfilePrefix, XpForLevelPrefix],
+	prefixCommands: [ProfilePrefix, UpdateXpPrefix, XpForLevelPrefix],
 };

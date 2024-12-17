@@ -61,7 +61,7 @@ export const PermissionCommand: SlashCommand = {
 				);
 				options = commands.map((command) => {
 					return {
-						name: client.capitalize(command.config.name),
+						name: command.config.name,
 						value: command.config.name,
 					};
 				});

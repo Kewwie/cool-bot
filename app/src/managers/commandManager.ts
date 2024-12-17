@@ -15,6 +15,7 @@ import { EventList } from "@/types/event";
 export class CommandManager {
 	public client: KiwiClient;
 	public PrefixCommands: Collection<string, PrefixCommand>;
+	public Aliases: Collection<string, string>;
 	public SlashCommands: Collection<string, SlashCommand>;
 	public UserCommands: Collection<string, UserCommand>;
 	private RestAPI: REST;
@@ -23,6 +24,7 @@ export class CommandManager {
 		this.client = client;
 
 		this.PrefixCommands = new Collection();
+		this.Aliases = new Collection();
 		this.SlashCommands = new Collection();
 		this.UserCommands = new Collection();
 		this.RestAPI = new REST({ version: "10" }).setToken(env.CLIENT_TOKEN);
@@ -34,7 +36,7 @@ export class CommandManager {
 	loadPrefix(command: PrefixCommand) {
 		this.PrefixCommands.set(command.config.name, command);
 		for (let alias of command.config.aliases || []) {
-			this.PrefixCommands.set(alias, command);
+			this.Aliases.set(alias, command.config.name);
 		}
 	}
 
@@ -158,6 +160,7 @@ export class CommandManager {
 		let commandName = textArgs.shift()?.toLowerCase();
 		if (!commandName) return;
 
+		commandName = this.Aliases.get(commandName) || commandName;
 		let command = this.PrefixCommands.get(commandName);
 		if (!command) return;
 
@@ -168,13 +171,50 @@ export class CommandManager {
 		}
 
 		if (message.guildId) {
-			var checks = await this.client.ModuleManager.checkGuild(
-				message.guild,
-				message.author,
-				command.module
+			var userAllowed = false;
+			var cfg = await this.client.db.getGuildConfig(message.guildId);
+			var member = await message.guild?.members.fetch(message.author.id);
+			var permissionExists = cfg.permissions.find((perm) =>
+				perm.commands.includes(commandName)
 			);
-			if (!checks.status) {
-				await channel.send(checks.response);
+			for (var role of member.roles.cache.values()) {
+				var perm = cfg.permissions.find((perm) => perm.roleId === role.id);
+				if (perm && perm.commands.includes(commandName)) {
+					userAllowed = true;
+					break;
+				}
+			}
+
+			if (!userAllowed && !permissionExists && command.config.defaultPermissions) {
+				for (var permission of command.config.defaultPermissions || []) {
+					if (member.permissions.has(permission)) {
+						userAllowed = true;
+						break;
+					}
+				}
+			} else if (!permissionExists && !command.config.defaultPermissions) {
+				userAllowed = true;
+			}
+
+			if (!userAllowed) {
+				var checks = await this.client.ModuleManager.checkGuild(
+					message.guild,
+					message.author,
+					command.module
+				);
+				if (checks.status) userAllowed = true;
+				else if (!checks.status) {
+					channel.send({
+						content: checks.response,
+					});
+					return;
+				}
+			}
+
+			if (!userAllowed) {
+				channel.send({
+					content: "You do not have permission to use this command",
+				});
 				return;
 			}
 		}
