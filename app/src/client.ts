@@ -151,8 +151,8 @@ export class KiwiClient extends Client {
 		} else if (value.startsWith("<@&") && value.endsWith(">")) {
 			value = value.slice(3, -1);
 		} else if (value.includes("u") && message.reference) {
-			var messageReference = await message.fetchReference();
-			value = messageReference.author.id;
+			var messageReference = await message.fetchReference().catch(() => null);
+			value = messageReference?.author?.id;
 		} else if (!/^\d{17,19}$/.test(value)) {
 			value = null;
 		}
