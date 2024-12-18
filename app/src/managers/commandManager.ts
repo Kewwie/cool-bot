@@ -313,22 +313,22 @@ export class CommandManager {
 						if (!id && option.defaultSelf) {
 							id = message.author.id;
 						}
-						entry = await this.client.users.fetch(id);
+						entry = await this.client.users.fetch(id).catch(() => null);
 						args.push(entry);
 					} else if (option.type === ConfigOptionTypes.MEMBER) {
 						if (!id && option.defaultSelf) {
 							id = message.author.id;
 						}
-						entry = await message.guild?.members.fetch(id);
+						entry = await message.guild?.members.fetch(id).catch(() => null);
 						args.push(entry);
 					} else if (option.type === ConfigOptionTypes.CHANNEL) {
 						if (!id && option.defaultSelf) {
 							id = message.channel.id;
 						}
-						entry = await message.guild?.channels.fetch(id);
+						entry = await message.guild?.channels.fetch(id).catch(() => null);
 						args.push(entry);
 					} else if (option.type === ConfigOptionTypes.ROLE && id) {
-						entry = await message.guild?.roles.fetch(id);
+						entry = await message.guild?.roles.fetch(id).catch(() => null);
 						args.push(entry);
 					}
 					if (!entry) {
