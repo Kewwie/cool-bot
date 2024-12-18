@@ -43,7 +43,7 @@ export const TimeoutPrefix: PrefixCommand = {
 
 		try {
 			if (minutes <= 0) {
-				member.timeout(0, reason);
+				member.timeout(null, reason);
 			} else {
 				var time = minutes * 1000 * 60;
 				await member.timeout(time, reason);
