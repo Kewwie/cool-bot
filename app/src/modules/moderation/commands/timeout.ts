@@ -40,9 +40,21 @@ export const TimeoutPrefix: PrefixCommand = {
 			commandOptions.channel.send("You cannot timeout a bot");
 			return;
 		}
-		var time = minutes * 1000 * 60;
+
 		try {
-			await member.timeout(time, reason);
+			if (minutes <= 0) {
+				member.timeout(0, reason);
+			} else {
+				var time = minutes * 1000 * 60;
+				await member.timeout(time, reason);
+				client.db.createInfraction(
+					message.guild.id,
+					member.id,
+					member.user.username,
+					reason
+				);
+			}
+
 			var timeoutEmbed = new EmbedBuilder()
 				.setTitle("User Timed Out")
 				.setColor(client.Colors.primary)
@@ -53,7 +65,6 @@ export const TimeoutPrefix: PrefixCommand = {
 				)
 				.setFooter({ text: `Moderator: ${message.author.username}` });
 			commandOptions.channel.send({ embeds: [timeoutEmbed] });
-			client.db.createInfraction(message.guild.id, member.id, member.user.username, reason);
 		} catch (error) {
 			commandOptions.channel.send("Could not timeout user");
 		}
