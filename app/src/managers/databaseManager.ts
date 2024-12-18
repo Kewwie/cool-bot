@@ -127,6 +127,7 @@ export class DatabaseManager {
 		infraction.infractionId = highestInfractionId + 1;
 		infraction.userName = userName;
 		infraction.reason = reason;
+		infraction.expiresAt = new Date(Date.now() + 90 * 24 * 60 * 60 * 1000);
 		return await this.repos.infractions.save(infraction);
 	}
 
