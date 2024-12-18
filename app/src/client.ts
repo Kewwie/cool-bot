@@ -6,22 +6,28 @@ import {
 	ClientPresenceStatus,
 	Message,
 	TextChannel,
-} from 'discord.js';
+} from "discord.js";
 
-import { DatabaseManager } from './managers/databaseManager';
+import { DatabaseManager } from "./managers/databaseManager";
 
-import { EventManager } from './managers/eventManager';
-import { ComponentManager } from './managers/componentManager';
-import { CommandManager } from './managers/commandManager';
-import { ScheduleManager } from './managers/scheduleManager';
-import { ModuleManager } from './managers/moduleManager';
-import { CustomOptions } from './types/component';
+import { EventManager } from "./managers/eventManager";
+import { ComponentManager } from "./managers/componentManager";
+import { CommandManager } from "./managers/commandManager";
+import { ScheduleManager } from "./managers/scheduleManager";
+import { ModuleManager } from "./managers/moduleManager";
+import { CustomOptions } from "./types/component";
 
-import { Emojis } from './emojis';
+import { Emojis } from "./emojis";
 
 export class KiwiClient extends Client {
 	public Settings: {
 		color: ColorResolvable;
+	};
+	public Colors: {
+		primary: ColorResolvable;
+		secondary: ColorResolvable;
+		success: ColorResolvable;
+		error: ColorResolvable;
 	};
 	public db: DatabaseManager;
 
@@ -48,19 +54,21 @@ export class KiwiClient extends Client {
 				//GatewayIntentBits.AutoModerationExecution,
 				//GatewayIntentBits.AutoModerationConfiguration,
 			],
-			partials: [
-				Partials.GuildMember,
-				Partials.Channel,
-				Partials.Message,
-				Partials.User,
-			],
+			partials: [Partials.GuildMember, Partials.Channel, Partials.Message, Partials.User],
 			presence: {
-				status: 'online' as ClientPresenceStatus,
+				status: "online" as ClientPresenceStatus,
 			},
 		});
 
 		this.Settings = {
-			color: '#7289DA',
+			color: "#7289DA",
+		};
+
+		this.Colors = {
+			primary: "#2b2d31",
+			secondary: "#2C2F33",
+			success: "#43B581",
+			error: "#F04747",
 		};
 
 		// Database Manager
@@ -80,7 +88,7 @@ export class KiwiClient extends Client {
 
 		this.ModuleManager = new ModuleManager(this);
 
-		this.formatNumber = new Intl.NumberFormat('en-US', {
+		this.formatNumber = new Intl.NumberFormat("en-US", {
 			minimumFractionDigits: 0,
 			maximumFractionDigits: 0,
 		}).format;
@@ -91,49 +99,41 @@ export class KiwiClient extends Client {
 	}
 
 	public addSpace(value: string) {
-		return value.replace(/([A-Z])/g, ' $1').trim();
+		return value.replace(/([A-Z])/g, " $1").trim();
 	}
 
-	public generateProgressBar(
-		progress: number,
-		total: number,
-		length: number
-	) {
+	public generateProgressBar(progress: number, total: number, length: number) {
 		if (progress > total) progress = total;
 		if (progress < 0) progress = 0;
 
 		var filledBlocks = Math.floor((progress / total) * length);
 		var emptyBlocks = length - filledBlocks;
-		var progressBar = '';
+		var progressBar = "";
 
 		progressBar +=
-			filledBlocks > 0
-				? Emojis.progressBar.filledStart
-				: Emojis.progressBar.emptyStart;
+			filledBlocks > 0 ? Emojis.progressBar.filledStart : Emojis.progressBar.emptyStart;
 		if (filledBlocks > 1) filledBlocks--;
 		progressBar += Emojis.progressBar.filledMiddle.repeat(filledBlocks);
 		if (emptyBlocks > 1) emptyBlocks--;
 		progressBar += Emojis.progressBar.emptyMiddle.repeat(emptyBlocks);
 		progressBar +=
-			filledBlocks === length
-				? Emojis.progressBar.filledEnd
-				: Emojis.progressBar.emptyEnd;
+			filledBlocks === length ? Emojis.progressBar.filledEnd : Emojis.progressBar.emptyEnd;
 		return progressBar;
 	}
 
 	public createCustomId(options: CustomOptions): string {
 		var customId = new Array<string>();
 		for (var [key, value] of Object.entries(options)) {
-			if (customId.includes('&')) continue;
+			if (customId.includes("&")) continue;
 			if (!key || !value) continue;
 			key = this.ComponentManager.getShortKey(key);
 			customId.push(`${key}=${value}`);
 		}
-		return customId.join('&');
+		return customId.join("&");
 	}
 
 	public getBoolean(value: string) {
-		if (value.toLowerCase() === 'true') {
+		if (value.toLowerCase() === "true") {
 			return true;
 		} else {
 			return false;
@@ -141,20 +141,16 @@ export class KiwiClient extends Client {
 	}
 
 	public async getId(message: Message, value: string): Promise<string> {
-		if (
-			value.startsWith('<@') &&
-			value.endsWith('>') &&
-			!value.startsWith('<@&')
-		) {
+		if (value.startsWith("<@") && value.endsWith(">") && !value.startsWith("<@&")) {
 			value = value.slice(2, -1);
-			if (value.startsWith('!')) {
+			if (value.startsWith("!")) {
 				value = value.slice(1);
 			}
-		} else if (value.startsWith('<#') && value.endsWith('>')) {
+		} else if (value.startsWith("<#") && value.endsWith(">")) {
 			value = value.slice(2, -1);
-		} else if (value.startsWith('<@&') && value.endsWith('>')) {
+		} else if (value.startsWith("<@&") && value.endsWith(">")) {
 			value = value.slice(3, -1);
-		} else if (value.includes('u') && message.reference) {
+		} else if (value.includes("u") && message.reference) {
 			var messageReference = await message.fetchReference();
 			value = messageReference.author.id;
 		} else if (!/^\d{17,19}$/.test(value)) {
@@ -163,11 +159,7 @@ export class KiwiClient extends Client {
 		return value;
 	}
 
-	public createMessageUrl(
-		guildId: string,
-		channelId: string,
-		messageId: string
-	): string {
+	public createMessageUrl(guildId: string, channelId: string, messageId: string): string {
 		return `https://discord.com/channels/${guildId}/${channelId}/${messageId}`;
 	}
 
