@@ -25,26 +25,29 @@ export const InfractionsPrefix: PrefixCommand = {
 		member: GuildMember
 	) {
 		var infractions = await client.db.getInfractions(message.guild.id, member.id);
-		try {
-			var infractionsEmbed = new EmbedBuilder()
-				.setTitle(client.capitalize(member.user.username) + " Infractions")
-				.setColor("#2b2d31")
-				.addFields(
-					infractions.map((infraction) => {
-						const daysUntilExpiration = Math.ceil(
-							(new Date(infraction.expiresAt).getTime() - Date.now()) /
-								(1000 * 60 * 60 * 24)
-						);
-						return {
-							name: `Infraction #${infraction.id} (Expires in ${daysUntilExpiration} days)`,
-							value: `Reason: ${infraction.reason}`,
-						};
-					})
-				);
-
-			commandOptions.channel.send({ embeds: [infractionsEmbed] });
-		} catch (error) {
-			commandOptions.channel.send("Could not ban user");
+		if (!infractions.length) {
+			commandOptions.channel.send({
+				content: "This user has no infractions",
+			});
+			return;
 		}
+
+		var infractionsEmbed = new EmbedBuilder()
+			.setTitle(client.capitalize(member.user.username) + "'s Infractions")
+			.setColor(client.Colors.primary)
+			.addFields(
+				infractions.map((infraction) => {
+					var daysUntilExpiration = Math.ceil(
+						(new Date(infraction.expiresAt).getTime() - Date.now()) /
+							(1000 * 60 * 60 * 24)
+					);
+					return {
+						name: `Infraction #${infraction.infractionId} (Expires in ${daysUntilExpiration} days)`,
+						value: `Reason: ${infraction.reason}`,
+					};
+				})
+			);
+
+		commandOptions.channel.send({ embeds: [infractionsEmbed] });
 	},
 };
