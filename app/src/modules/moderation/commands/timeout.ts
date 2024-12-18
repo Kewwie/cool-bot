@@ -44,8 +44,8 @@ export const TimeoutPrefix: PrefixCommand = {
 		try {
 			await member.timeout(time, reason);
 			var timeoutEmbed = new EmbedBuilder()
-				.setTitle("User Timeout")
-				.setColor("#2b2d31")
+				.setTitle("User Timed Out")
+				.setColor(client.Colors.primary)
 				.addFields(
 					{ name: "User", value: `<@${member.id}>\n${member.user.username}` },
 					{ name: "Minutes", value: minutes.toString() },
