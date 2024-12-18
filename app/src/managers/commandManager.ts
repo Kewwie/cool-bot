@@ -215,21 +215,24 @@ export class CommandManager {
 						break;
 					}
 				}
-			} else if (!permissionExists && !command.config.defaultPermissions) {
-				userAllowed = true;
 			}
 
-			if (command.module.permissions) {
-				var hasPermission = false;
+			if (!userAllowed && command.module.permissions) {
 				for (var permission of command.module.permissions) {
 					if (member.permissions.has(permission)) {
-						hasPermission = true;
+						userAllowed = true;
 						break;
 					}
 				}
-				if (hasPermission) {
-					userAllowed = true;
-				}
+			}
+
+			if (
+				!permissionExists &&
+				(!command.config.defaultPermissions ||
+					command.config.defaultPermissions?.length <= 0) &&
+				(!command.module.permissions || command.module.permissions?.length <= 0)
+			) {
+				userAllowed = true;
 			}
 
 			if (!userAllowed) {
