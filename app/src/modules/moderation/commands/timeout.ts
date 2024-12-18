@@ -46,7 +46,7 @@ export const TimeoutPrefix: PrefixCommand = {
 				member.timeout(null, reason);
 			} else {
 				var time = minutes * 1000 * 60;
-				await member.timeout(time, reason);
+				member.timeout(time, reason);
 				client.db.createInfraction(
 					message.guild.id,
 					member.id,
