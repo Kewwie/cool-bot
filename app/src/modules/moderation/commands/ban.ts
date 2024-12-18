@@ -45,7 +45,7 @@ export const BanPrefix: PrefixCommand = {
 			await member.ban({ reason });
 			var timeoutEmbed = new EmbedBuilder()
 				.setTitle("User Banned")
-				.setColor("#2b2d31")
+				.setColor(client.Colors.primary)
 				.addFields(
 					{ name: "User", value: `<@${member.id}>\n${member.user.username}` },
 					{ name: "Reason", value: reason }
