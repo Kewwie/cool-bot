@@ -21,7 +21,13 @@ export const checkBeforeModeration = async (
         return { status: false, message: "You cannot punish a bot" };
     }
 
-    if (member.roles.highest.position >= message.member.roles.highest.position) {
+    if (!message.member.roles.highest) {
+        return { status: false, message: "You cannot punish this user" };
+    }
+
+    console.log(member);
+    var position = member.roles?.highest?.position ?? 0;
+    if (message.member.roles.highest.position <= position) {
         return { status: false, message: "You cannot punish this user" };
     }
 

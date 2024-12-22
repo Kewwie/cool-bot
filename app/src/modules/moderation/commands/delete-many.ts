@@ -23,8 +23,6 @@ export const DeleteManyPrefix: PrefixCommand = {
         ],
     },
 
-    checks: [checkBeforeModeration],
-
     async execute(
         client: KiwiClient,
         message: Message,

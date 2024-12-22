@@ -153,6 +153,7 @@ export class CommandManager {
     }
 
     async onMessage(message: Message) {
+        if (!message.guildId) return;
         if (message.author.bot) return;
         if (!message.content.startsWith(env.PREFIX)) return;
 
@@ -251,22 +252,6 @@ export class CommandManager {
             channel: message.channel as TextChannel,
         };
 
-        if (command.checks) {
-            var checkFailed = false;
-            for (let check of command.checks) {
-                var checks = await check(this.client, message, commandOptions, ...textArgs);
-                if (!checks.status) {
-                    checkFailed = true;
-                }
-            }
-            if (checkFailed) {
-                commandOptions.channel.send({
-                    content: checks.message,
-                });
-                return;
-            }
-        }
-
         var count = 0;
         var args = new Array();
         if (command.config.options) {
@@ -355,6 +340,18 @@ export class CommandManager {
                     }
                 }
                 count++;
+            }
+        }
+
+        if (command.checks) {
+            for (let check of command.checks) {
+                var checks = await check(this.client, message, commandOptions, ...args);
+                if (!checks.status) {
+                    commandOptions.channel.send({
+                        content: checks.message,
+                    });
+                    return;
+                }
             }
         }
 
